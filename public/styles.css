@@ -2,29 +2,119 @@
 
 @layer theme {
   :root {
-    /* Neo-Skeuomorphism White / Porcelain Design Tokens */
-    --neo-bg: #ecf0f5;
-    --neo-surface-hi: #f7f9fc;
-    --neo-surface-lo: #e2e7ef;
-    --neo-shadow-dark: #c8d0dd;
-    --neo-shadow-light: #ffffff;
-    --neo-border-light: rgba(255, 255, 255, 0.85);
-    --neo-border-subtle: rgba(185, 196, 214, 0.55);
+    /* Tier 1: Raw Light (Porcelain White) & Dark (Obsidian Graphite) Neo-Skeuomorphism Tokens */
+    --neo-bg-light: #ecf0f5;
+    --neo-bg-dark: #161920;
 
-    --text-main: #1d2432;
-    --text-muted: #525d72;
+    --neo-grad-start-light: #f3f6fa;
+    --neo-grad-start-dark: #1b1f28;
+    --neo-grad-end-light: #e5eaf2;
+    --neo-grad-end-dark: #12151b;
 
-    --brand-color: #d92b2b;
-    --brand-color-hi: #f04848;
-    --brand-shadow: rgba(217, 43, 43, 0.32);
+    --neo-surface-hi-light: #f7f9fc;
+    --neo-surface-hi-dark: #1f242f;
+    --neo-surface-lo-light: #e2e7ef;
+    --neo-surface-lo-dark: #13161d;
+
+    --neo-shadow-dark-light: #c8d0dd;
+    --neo-shadow-dark-dark: #0a0c10;
+    --neo-shadow-light-light: #ffffff;
+    --neo-shadow-light-dark: #252b38;
+
+    --neo-border-light-light: rgba(255, 255, 255, 0.85);
+    --neo-border-light-dark: rgba(255, 255, 255, 0.07);
+    --neo-border-subtle-light: rgba(185, 196, 214, 0.55);
+    --neo-border-subtle-dark: rgba(10, 12, 16, 0.65);
+
+    --text-main-light: #1d2432;
+    --text-main-dark: #eef2f8;
+    --text-muted-light: #525d72;
+    --text-muted-dark: #9ba6ba;
+
+    --brand-color-light: #d92b2b;
+    --brand-color-dark: #ff4747;
+    --brand-color-hi-light: #f04848;
+    --brand-color-hi-dark: #ff6666;
+    --brand-shadow-light: rgba(217, 43, 43, 0.32);
+    --brand-shadow-dark: rgba(0, 0, 0, 0.55);
+
+    --banner-hi-light: #fff6f6;
+    --banner-hi-dark: #26181b;
+    --banner-lo-light: #f4e6e6;
+    --banner-lo-dark: #1c1215;
 
     --success-color: #1f7a3f;
     --success-color-hi: #2b9952;
 
-    --scrollbar-track: #e2e7ef;
-    --scrollbar-thumb: #a7b2c4;
+    --scrollbar-track-light: #e2e7ef;
+    --scrollbar-track-dark: #14171f;
+    --scrollbar-thumb-light: #a7b2c4;
+    --scrollbar-thumb-dark: #384052;
 
-    /* Gradient color space fallback token (visual-effects guide) */
+    /* Default fallback tokens (Light) */
+    --neo-bg: var(--neo-bg-light);
+    --neo-grad-start: var(--neo-grad-start-light);
+    --neo-grad-end: var(--neo-grad-end-light);
+    --neo-surface-hi: var(--neo-surface-hi-light);
+    --neo-surface-lo: var(--neo-surface-lo-light);
+    --neo-shadow-dark: var(--neo-shadow-dark-light);
+    --neo-shadow-light: var(--neo-shadow-light-light);
+    --neo-border-light: var(--neo-border-light-light);
+    --neo-border-subtle: var(--neo-border-subtle-light);
+    --text-main: var(--text-main-light);
+    --text-muted: var(--text-muted-light);
+    --brand-color: var(--brand-color-light);
+    --brand-color-hi: var(--brand-color-hi-light);
+    --brand-shadow: var(--brand-shadow-light);
+    --banner-hi: var(--banner-hi-light);
+    --banner-lo: var(--banner-lo-light);
+    --scrollbar-track: var(--scrollbar-track-light);
+    --scrollbar-thumb: var(--scrollbar-thumb-light);
+
+    /* MANDATORY fallback for browsers without light-dark() support */
+    @media (prefers-color-scheme: dark) {
+      --neo-bg: var(--neo-bg-dark);
+      --neo-grad-start: var(--neo-grad-start-dark);
+      --neo-grad-end: var(--neo-grad-end-dark);
+      --neo-surface-hi: var(--neo-surface-hi-dark);
+      --neo-surface-lo: var(--neo-surface-lo-dark);
+      --neo-shadow-dark: var(--neo-shadow-dark-dark);
+      --neo-shadow-light: var(--neo-shadow-light-dark);
+      --neo-border-light: var(--neo-border-light-dark);
+      --neo-border-subtle: var(--neo-border-subtle-dark);
+      --text-main: var(--text-main-dark);
+      --text-muted: var(--text-muted-dark);
+      --brand-color: var(--brand-color-dark);
+      --brand-color-hi: var(--brand-color-hi-dark);
+      --brand-shadow: var(--brand-shadow-dark);
+      --banner-hi: var(--banner-hi-dark);
+      --banner-lo: var(--banner-lo-dark);
+      --scrollbar-track: var(--scrollbar-track-dark);
+      --scrollbar-thumb: var(--scrollbar-thumb-dark);
+    }
+
+    /* Modern light-dark() automatic scheme resolution (dark-mode & dark-mode-toggle guides) */
+    @supports (color: light-dark(white, black)) {
+      --neo-bg: light-dark(var(--neo-bg-light), var(--neo-bg-dark));
+      --neo-grad-start: light-dark(var(--neo-grad-start-light), var(--neo-grad-start-dark));
+      --neo-grad-end: light-dark(var(--neo-grad-end-light), var(--neo-grad-end-dark));
+      --neo-surface-hi: light-dark(var(--neo-surface-hi-light), var(--neo-surface-hi-dark));
+      --neo-surface-lo: light-dark(var(--neo-surface-lo-light), var(--neo-surface-lo-dark));
+      --neo-shadow-dark: light-dark(var(--neo-shadow-dark-light), var(--neo-shadow-dark-dark));
+      --neo-shadow-light: light-dark(var(--neo-shadow-light-light), var(--neo-shadow-light-dark));
+      --neo-border-light: light-dark(var(--neo-border-light-light), var(--neo-border-light-dark));
+      --neo-border-subtle: light-dark(var(--neo-border-subtle-light), var(--neo-border-subtle-dark));
+      --text-main: light-dark(var(--text-main-light), var(--text-main-dark));
+      --text-muted: light-dark(var(--text-muted-light), var(--text-muted-dark));
+      --brand-color: light-dark(var(--brand-color-light), var(--brand-color-dark));
+      --brand-color-hi: light-dark(var(--brand-color-hi-light), var(--brand-color-hi-dark));
+      --brand-shadow: light-dark(var(--brand-shadow-light), var(--brand-shadow-dark));
+      --banner-hi: light-dark(var(--banner-hi-light), var(--banner-hi-dark));
+      --banner-lo: light-dark(var(--banner-lo-light), var(--banner-lo-dark));
+      --scrollbar-track: light-dark(var(--scrollbar-track-light), var(--scrollbar-track-dark));
+      --scrollbar-thumb: light-dark(var(--scrollbar-thumb-light), var(--scrollbar-thumb-dark));
+    }
+
     --in-oklab: ;
 
     /* Multi-layered Neo-Skeuomorphic elevation shadows */
@@ -46,7 +136,16 @@
       inset 3px 3px 6px var(--neo-shadow-dark),
       inset -3px -3px 6px var(--neo-shadow-light);
 
-    color-scheme: light;
+    /* MANDATORY base color-scheme declaration + meta override reflection (dark-mode-toggle guide) */
+    color-scheme: light dark;
+
+    &:has(> head > meta[name="color-scheme"][content="dark"]) {
+      color-scheme: dark;
+    }
+    &:has(> head > meta[name="color-scheme"][content="light"]) {
+      color-scheme: light;
+    }
+
     accent-color: var(--brand-color);
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
@@ -58,7 +157,6 @@
     }
   }
 
-  /* Forced Colors Mode fallback (color guide) */
   @media (forced-colors: active) {
     .card,
     .btn,
@@ -123,7 +221,7 @@
       env(safe-area-inset-left, 0px);
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background-color: var(--neo-bg);
-    background-image: linear-gradient(160deg var(--in-oklab), #f3f6fa, #e5eaf2);
+    background-image: linear-gradient(160deg var(--in-oklab), var(--neo-grad-start), var(--neo-grad-end));
     color: var(--text-main);
     accent-color: var(--brand-color);
     min-height: 100dvh;
@@ -153,6 +251,12 @@
     border: 1px solid var(--neo-border-light);
   }
 
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
   .brand-row {
     display: flex;
     align-items: center;
@@ -171,7 +275,7 @@
 
   .brand-title {
     margin: 0;
-    font-size: 1.22rem;
+    font-size: 1.18rem;
     font-weight: 800;
     letter-spacing: -0.02em;
     color: var(--text-main);
@@ -179,7 +283,7 @@
 
   .brand-subtitle {
     margin: 0;
-    font-size: 0.73rem;
+    font-size: 0.72rem;
     color: var(--text-muted);
     font-weight: 500;
   }
@@ -197,8 +301,8 @@
   }
 
   .install-banner {
-    background: linear-gradient(145deg var(--in-oklab), #fff6f6, #f4e6e6);
-    border: 1px solid rgba(217, 43, 43, 0.25);
+    background: linear-gradient(145deg var(--in-oklab), var(--banner-hi), var(--banner-lo));
+    border: 1px solid rgba(217, 43, 43, 0.28);
   }
 
   .install-banner h2 {
@@ -229,7 +333,6 @@
     gap: 8px;
   }
 
-  /* Recessed Neo-Skeuomorphic Input Well */
   .search-input-wrap {
     display: flex;
     align-items: center;
@@ -246,7 +349,7 @@
     border-color: var(--brand-color);
     box-shadow:
       var(--neo-inset),
-      0 0 0 2px rgba(217, 43, 43, 0.16);
+      0 0 0 2px rgba(217, 43, 43, 0.2);
   }
 
   .search-input-wrap input[type="search"] {
@@ -297,16 +400,16 @@
   .btn-primary {
     background: linear-gradient(145deg var(--in-oklab), var(--brand-color-hi), var(--brand-color));
     color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.35);
+    border-color: rgba(255, 255, 255, 0.3);
     box-shadow:
       6px 6px 14px var(--brand-shadow),
       -4px -4px 12px var(--neo-shadow-light),
-      inset 0 1px 1px rgba(255, 255, 255, 0.45);
+      inset 0 1px 1px rgba(255, 255, 255, 0.4);
     flex: 1;
   }
 
   .btn-primary:active:not(:disabled) {
-    box-shadow: inset 3px 3px 7px rgba(120, 12, 12, 0.45);
+    box-shadow: inset 3px 3px 7px rgba(80, 8, 8, 0.55);
   }
 
   .btn-secondary {
@@ -319,7 +422,7 @@
   .btn-success {
     background: linear-gradient(145deg var(--in-oklab), var(--success-color-hi), var(--success-color));
     color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.35);
+    border-color: rgba(255, 255, 255, 0.3);
     box-shadow:
       6px 6px 14px rgba(31, 122, 63, 0.28),
       -4px -4px 12px var(--neo-shadow-light),
@@ -337,9 +440,9 @@
     border: 1px solid var(--neo-border-light);
     border-radius: 13px;
     corner-shape: squircle;
-    padding: 9px 12px;
+    padding: 9px 11px;
     cursor: pointer;
-    font-size: 0.82rem;
+    font-size: 0.81rem;
     font-weight: 700;
     box-shadow: var(--neo-raised-sm);
     transition: transform 0.12s ease, box-shadow 0.15s ease;
@@ -353,7 +456,7 @@
   .btn-download-pill {
     background: linear-gradient(145deg var(--in-oklab), var(--brand-color-hi), var(--brand-color));
     color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow:
       4px 4px 10px var(--brand-shadow),
       -3px -3px 8px var(--neo-shadow-light),
@@ -382,7 +485,6 @@
     flex-wrap: wrap;
   }
 
-  /* Tactile Neo-Skeuomorphic Pill Switches using :has() (child-state-based-styling guide) */
   .radio-label,
   .checkbox-label {
     --pill-bg: linear-gradient(145deg var(--in-oklab), var(--neo-surface-hi), var(--neo-surface-lo));
@@ -412,17 +514,16 @@
     --pill-bg: var(--neo-bg);
     --pill-shadow: var(--neo-inset-sm);
     --pill-text: var(--brand-color);
-    --pill-border: rgba(217, 43, 43, 0.35);
+    --pill-border: rgba(217, 43, 43, 0.4);
   }
 
-  /* Fallback for browsers without :has() support (child-state-based-styling guide) */
   @supports not selector(:has(*)) {
     .radio-label.is-checked,
     .checkbox-label.is-checked {
       --pill-bg: var(--neo-bg);
       --pill-shadow: var(--neo-inset-sm);
       --pill-text: var(--brand-color);
-      --pill-border: rgba(217, 43, 43, 0.35);
+      --pill-border: rgba(217, 43, 43, 0.4);
     }
   }
 
@@ -441,7 +542,7 @@
     height: 64px;
     border-radius: 12px;
     object-fit: cover;
-    background: #d8dfe9;
+    background: var(--neo-bg);
     flex-shrink: 0;
     box-shadow:
       4px 4px 10px var(--neo-shadow-dark),
@@ -488,7 +589,6 @@
     border-radius: 8px;
   }
 
-  /* Progressive enhancement fallback for browsers without accent-color (brand-consistent-forms guide) */
   @supports not (accent-color: var(--brand-color)) {
     form input[type="checkbox"].visually-hidden {
       position: absolute !important;
@@ -622,7 +722,7 @@
     height: 100%;
     object-fit: cover;
     border-radius: 10px;
-    background: #d8dfe9;
+    background: var(--neo-bg);
     box-shadow:
       3px 3px 8px var(--neo-shadow-dark),
       -2px -2px 6px var(--neo-shadow-light);
@@ -632,7 +732,7 @@
     position: absolute;
     right: 4px;
     bottom: 4px;
-    background: rgba(29, 36, 50, 0.84);
+    background: rgba(15, 18, 25, 0.86);
     color: #ffffff;
     font-size: 0.66rem;
     font-weight: 700;

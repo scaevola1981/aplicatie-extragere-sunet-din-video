@@ -3,17 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="color-scheme" content="light">
-  <meta name="theme-color" content="#ecf0f5">
+  <meta name="color-scheme" content="light dark">
+  <script>
+    try {
+      document.querySelector('meta[name="color-scheme"]').content = localStorage.getItem("color-scheme") ?? "light dark";
+    } catch (_) {}
+  </script>
+  <meta name="theme-color" content="#ecf0f5" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#161920" media="(prefers-color-scheme: dark)">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="YT2MP3">
   <title>YT2MP3 — Descarcă Muzică MP3 din YouTube</title>
-  <link rel="manifest" href="./manifest.json?v=5">
+  <link rel="manifest" href="./manifest.json?v=6">
   <link rel="icon" type="image/svg+xml" href="./icon.svg">
   <link rel="apple-touch-icon" href="./icon.svg">
-  <link rel="stylesheet" href="./styles.css?v=5">
+  <link rel="stylesheet" href="./styles.css?v=6">
 </head>
 <body>
   <main class="app-container">
@@ -22,10 +28,15 @@
         <img src="./icon.svg" alt="YT2MP3" class="brand-icon">
         <div>
           <h1 class="brand-title">YT2MP3</h1>
-          <p class="brand-subtitle">iOS &amp; Android PWA • Neo-Skeuomorphism</p>
+          <p class="brand-subtitle">Neo-Skeuomorphism • White &amp; Dark</p>
         </div>
       </div>
-      <button type="button" id="installHelpBtn" class="btn-icon">📲 Instalare iPhone</button>
+      <div class="header-actions">
+        <button type="button" id="themeToggleBtn" class="btn-icon" aria-label="Comută tema White / Dark">
+          🌓 Temă
+        </button>
+        <button type="button" id="installHelpBtn" class="btn-icon">📲 iPhone</button>
+      </div>
     </header>
 
     <!-- Ghid instalare PWA pe iPhone (fara Xcode / fara expirare la 7 zile) -->
@@ -115,6 +126,6 @@
     </section>
   </main>
 
-  <script src="./app.js?v=5"></script>
+  <script src="./app.js?v=6"></script>
 </body>
 </html>
