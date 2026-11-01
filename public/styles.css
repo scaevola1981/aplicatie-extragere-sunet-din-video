@@ -51,7 +51,7 @@
     --scrollbar-thumb-light: #a7b2c4;
     --scrollbar-thumb-dark: #384052;
 
-    /* Default fallback tokens (Light) */
+    /* Default values (Light) */
     --neo-bg: var(--neo-bg-light);
     --neo-grad-start: var(--neo-grad-start-light);
     --neo-grad-end: var(--neo-grad-end-light);
@@ -71,7 +71,6 @@
     --scrollbar-track: var(--scrollbar-track-light);
     --scrollbar-thumb: var(--scrollbar-thumb-light);
 
-    /* MANDATORY fallback for browsers without light-dark() support */
     @media (prefers-color-scheme: dark) {
       --neo-bg: var(--neo-bg-dark);
       --neo-grad-start: var(--neo-grad-start-dark);
@@ -93,7 +92,6 @@
       --scrollbar-thumb: var(--scrollbar-thumb-dark);
     }
 
-    /* Modern light-dark() automatic scheme resolution (dark-mode & dark-mode-toggle guides) */
     @supports (color: light-dark(white, black)) {
       --neo-bg: light-dark(var(--neo-bg-light), var(--neo-bg-dark));
       --neo-grad-start: light-dark(var(--neo-grad-start-light), var(--neo-grad-start-dark));
@@ -136,19 +134,56 @@
       inset 3px 3px 6px var(--neo-shadow-dark),
       inset -3px -3px 6px var(--neo-shadow-light);
 
-    /* MANDATORY base color-scheme declaration + meta override reflection (dark-mode-toggle guide) */
     color-scheme: light dark;
-
-    &:has(> head > meta[name="color-scheme"][content="dark"]) {
-      color-scheme: dark;
-    }
-    &:has(> head > meta[name="color-scheme"][content="light"]) {
-      color-scheme: light;
-    }
-
     accent-color: var(--brand-color);
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+
+  /* Explicit Dark override (via meta[name="color-scheme"] OR data-theme="dark") */
+  :root:where([data-theme="dark"], :has(> head > meta[name="color-scheme"][content="dark"])) {
+    color-scheme: dark;
+    --neo-bg: var(--neo-bg-dark);
+    --neo-grad-start: var(--neo-grad-start-dark);
+    --neo-grad-end: var(--neo-grad-end-dark);
+    --neo-surface-hi: var(--neo-surface-hi-dark);
+    --neo-surface-lo: var(--neo-surface-lo-dark);
+    --neo-shadow-dark: var(--neo-shadow-dark-dark);
+    --neo-shadow-light: var(--neo-shadow-light-dark);
+    --neo-border-light: var(--neo-border-light-dark);
+    --neo-border-subtle: var(--neo-border-subtle-dark);
+    --text-main: var(--text-main-dark);
+    --text-muted: var(--text-muted-dark);
+    --brand-color: var(--brand-color-dark);
+    --brand-color-hi: var(--brand-color-hi-dark);
+    --brand-shadow: var(--brand-shadow-dark);
+    --banner-hi: var(--banner-hi-dark);
+    --banner-lo: var(--banner-lo-dark);
+    --scrollbar-track: var(--scrollbar-track-dark);
+    --scrollbar-thumb: var(--scrollbar-thumb-dark);
+  }
+
+  /* Explicit Light / White override (via meta[name="color-scheme"] OR data-theme="light") */
+  :root:where([data-theme="light"], :has(> head > meta[name="color-scheme"][content="light"])) {
+    color-scheme: light;
+    --neo-bg: var(--neo-bg-light);
+    --neo-grad-start: var(--neo-grad-start-light);
+    --neo-grad-end: var(--neo-grad-end-light);
+    --neo-surface-hi: var(--neo-surface-hi-light);
+    --neo-surface-lo: var(--neo-surface-lo-light);
+    --neo-shadow-dark: var(--neo-shadow-dark-light);
+    --neo-shadow-light: var(--neo-shadow-light-light);
+    --neo-border-light: var(--neo-border-light-light);
+    --neo-border-subtle: var(--neo-border-subtle-light);
+    --text-main: var(--text-main-light);
+    --text-muted: var(--text-muted-light);
+    --brand-color: var(--brand-color-light);
+    --brand-color-hi: var(--brand-color-hi-light);
+    --brand-shadow: var(--brand-shadow-light);
+    --banner-hi: var(--banner-hi-light);
+    --banner-lo: var(--banner-lo-light);
+    --scrollbar-track: var(--scrollbar-track-light);
+    --scrollbar-thumb: var(--scrollbar-thumb-light);
   }
 
   @supports (background: linear-gradient(in oklab, white, black)) {
@@ -225,6 +260,7 @@
     color: var(--text-main);
     accent-color: var(--brand-color);
     min-height: 100dvh;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 }
 

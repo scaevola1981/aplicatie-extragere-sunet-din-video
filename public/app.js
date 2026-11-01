@@ -13,8 +13,77 @@
   const libraryCount = document.getElementById('libraryCount');
   const installHelpBtn = document.getElementById('installHelpBtn');
   const installBanner = document.getElementById('installBanner');
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
   const importMp3Btn = document.getElementById('importMp3Btn');
   const importMp3Input = document.getElementById('importMp3Input');
+  const colorSchemeMeta = document.querySelector('meta[name="color-scheme"]');
+  const darkMql = window.matchMedia('(prefers-color-scheme: dark)');
+
+  function getRenderedScheme() {
+    let stored = null;
+    try {
+      stored = localStorage.getItem('color-scheme');
+    } catch (_) {}
+    if (stored === 'light' || stored === 'dark') {
+      return stored;
+    }
+    return darkMql.matches ? 'dark' : 'light';
+  }
+
+  function updateThemeButtonLabel() {
+    if (!themeToggleBtn) return;
+    const current = getRenderedScheme();
+    themeToggleBtn.textContent = current === 'dark' ? '☀️ White' : '🌙 Dark';
+  }
+
+  function applySchemeToDom(storedOrNull) {
+    if (colorSchemeMeta) {
+      colorSchemeMeta.setAttribute('content', storedOrNull ?? 'light dark');
+    }
+    if (storedOrNull === 'light' || storedOrNull === 'dark') {
+      document.documentElement.dataset.theme = storedOrNull;
+    } else {
+      delete document.documentElement.dataset.theme;
+    }
+    updateThemeButtonLabel();
+  }
+
+  // Two-state color-scheme toggle conforming to dark-mode-toggle guide
+  if (themeToggleBtn && colorSchemeMeta) {
+    let initialStored = null;
+    try {
+      initialStored = localStorage.getItem('color-scheme');
+    } catch (_) {}
+    applySchemeToDom(initialStored);
+
+    themeToggleBtn.addEventListener('click', () => {
+      const currentRendered = getRenderedScheme();
+      const target = currentRendered === 'dark' ? 'light' : 'dark';
+      const systemScheme = darkMql.matches ? 'dark' : 'light';
+
+      try {
+        if (target !== systemScheme) {
+          localStorage.setItem('color-scheme', target);
+          applySchemeToDom(target);
+        } else {
+          localStorage.removeItem('color-scheme');
+          applySchemeToDom(null);
+        }
+      } catch (_) {
+        applySchemeToDom(target);
+      }
+    });
+
+    darkMql.addEventListener('change', () => {
+      updateThemeButtonLabel();
+    });
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'color-scheme') {
+        applySchemeToDom(e.newValue);
+      }
+    });
+  }
 
   // Backend API URL (Cloudflare HTTPS Tunnel sau ?api=https://...)
   const DEFAULT_TUNNEL_API = 'https://docs-receptor-pendant-football.trycloudflare.com';
@@ -28,7 +97,6 @@
     localStorage.getItem('yt2mp3_api_base') ||
     (isGitHubPages ? DEFAULT_TUNNEL_API : '');
 
-  // Lista de servere publice Piped cu suport CORS pentru GitHub Pages
   const PUBLIC_PIPED_APIS = [
     'https://api.piped.private.coffee',
     'https://pipedapi.ducks.party',
@@ -40,7 +108,6 @@
     localStorage.setItem('yt2mp3_auto_dl', autoDownloadCheck.checked ? '1' : '0');
   });
 
-  // Fallback pentru browsere vechi fara suport CSS :has() (child-state-based-styling guide)
   if (!CSS.supports('selector(:has(*))')) {
     const syncFallbackClasses = () => {
       document.querySelectorAll('.radio-label, .checkbox-label').forEach((lbl) => {
@@ -59,7 +126,7 @@
   });
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=5').catch(() => {});
+    navigator.serviceWorker.register('./sw.js?v=7').catch(() => {});
   }
 
   function getSelectedQuality() {

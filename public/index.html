@@ -6,7 +6,11 @@
   <meta name="color-scheme" content="light dark">
   <script>
     try {
-      document.querySelector('meta[name="color-scheme"]').content = localStorage.getItem("color-scheme") ?? "light dark";
+      const savedScheme = localStorage.getItem("color-scheme");
+      document.querySelector('meta[name="color-scheme"]').content = savedScheme ?? "light dark";
+      if (savedScheme === "light" || savedScheme === "dark") {
+        document.documentElement.dataset.theme = savedScheme;
+      }
     } catch (_) {}
   </script>
   <meta name="theme-color" content="#ecf0f5" media="(prefers-color-scheme: light)">
@@ -16,10 +20,10 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="YT2MP3">
   <title>YT2MP3 — Descarcă Muzică MP3 din YouTube</title>
-  <link rel="manifest" href="./manifest.json?v=6">
+  <link rel="manifest" href="./manifest.json?v=7">
   <link rel="icon" type="image/svg+xml" href="./icon.svg">
   <link rel="apple-touch-icon" href="./icon.svg">
-  <link rel="stylesheet" href="./styles.css?v=6">
+  <link rel="stylesheet" href="./styles.css?v=7">
 </head>
 <body>
   <main class="app-container">
@@ -126,6 +130,6 @@
     </section>
   </main>
 
-  <script src="./app.js?v=6"></script>
+  <script src="./app.js?v=7"></script>
 </body>
 </html>
