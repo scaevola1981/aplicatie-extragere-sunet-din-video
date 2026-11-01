@@ -3,18 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <!-- MANDATORY: Declare support for both light and dark themes -->
-  <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#e53935">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#ecf0f5">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="YT2MP3">
   <title>YT2MP3 — Descarcă Muzică MP3 din YouTube</title>
-  <link rel="manifest" href="./manifest.json?v=4">
+  <link rel="manifest" href="./manifest.json?v=5">
   <link rel="icon" type="image/svg+xml" href="./icon.svg">
   <link rel="apple-touch-icon" href="./icon.svg">
-  <link rel="stylesheet" href="./styles.css?v=4">
+  <link rel="stylesheet" href="./styles.css?v=5">
 </head>
 <body>
   <main class="app-container">
@@ -23,10 +22,10 @@
         <img src="./icon.svg" alt="YT2MP3" class="brand-icon">
         <div>
           <h1 class="brand-title">YT2MP3</h1>
-          <p class="brand-subtitle">iOS &amp; Android PWA • GitHub Pages Ready</p>
+          <p class="brand-subtitle">iOS &amp; Android PWA • Neo-Skeuomorphism</p>
         </div>
       </div>
-      <button type="button" id="installHelpBtn" class="btn-icon">📲 Cum instalez pe iPhone</button>
+      <button type="button" id="installHelpBtn" class="btn-icon">📲 Instalare iPhone</button>
     </header>
 
     <!-- Ghid instalare PWA pe iPhone (fara Xcode / fara expirare la 7 zile) -->
@@ -56,7 +55,7 @@
           >
         </div>
 
-        <div class="btn-row" style="margin-top: 10px;">
+        <div class="btn-row">
           <button type="button" id="pasteBtn" class="btn btn-secondary">
             📋 Lipește Link
           </button>
@@ -65,7 +64,7 @@
           </button>
         </div>
 
-        <fieldset class="quality-fieldset" style="margin-top: 12px;">
+        <fieldset class="quality-fieldset">
           <legend class="quality-legend">Calitate Audio MP3:</legend>
           <div class="quality-options">
             <label class="radio-label" for="q-best">
@@ -83,7 +82,7 @@
           </div>
         </fieldset>
 
-        <div style="margin-top: 10px;">
+        <div class="auto-dl-row">
           <label class="checkbox-label" for="autoDownloadCheck">
             <input type="checkbox" id="autoDownloadCheck" class="visually-hidden">
             <span>Pornește descărcarea MP3 automat când lipesc un link</span>
@@ -97,23 +96,25 @@
 
     <!-- Rezultate Cautare YouTube -->
     <section id="resultsSection" class="hidden">
-      <h2 id="resultsTitle" class="section-label" style="margin-bottom: 10px;">Rezultate YouTube</h2>
+      <div class="section-header-row">
+        <h2 id="resultsTitle" class="section-label">Rezultate YouTube</h2>
+      </div>
       <div id="resultsList" class="results-list"></div>
     </section>
 
     <!-- Biblioteca Offline MP3 (IndexedDB pe telefon) -->
     <section>
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px;">
+      <div class="section-header-row">
         <h2 class="section-label">🎵 Melodii MP3 Salvate (<span id="libraryCount">0</span>)</h2>
         <div>
           <input type="file" id="importMp3Input" accept="audio/mpeg,audio/mp3,audio/*" multiple class="hidden">
-          <button type="button" id="importMp3Btn" class="btn-icon">➕ Importă MP3 în Player</button>
+          <button type="button" id="importMp3Btn" class="btn-icon">➕ Importă MP3</button>
         </div>
       </div>
       <div id="libraryList" class="library-list"></div>
     </section>
   </main>
 
-  <script src="./app.js?v=4"></script>
+  <script src="./app.js?v=5"></script>
 </body>
 </html>

@@ -40,12 +40,26 @@
     localStorage.setItem('yt2mp3_auto_dl', autoDownloadCheck.checked ? '1' : '0');
   });
 
+  // Fallback pentru browsere vechi fara suport CSS :has() (child-state-based-styling guide)
+  if (!CSS.supports('selector(:has(*))')) {
+    const syncFallbackClasses = () => {
+      document.querySelectorAll('.radio-label, .checkbox-label').forEach((lbl) => {
+        const input = lbl.querySelector('input');
+        if (input) {
+          lbl.classList.toggle('is-checked', input.checked);
+        }
+      });
+    };
+    syncFallbackClasses();
+    searchForm.addEventListener('change', syncFallbackClasses);
+  }
+
   installHelpBtn.addEventListener('click', () => {
     installBanner.classList.toggle('hidden');
   });
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
+    navigator.serviceWorker.register('./sw.js?v=5').catch(() => {});
   }
 
   function getSelectedQuality() {
@@ -75,10 +89,7 @@
     return `${mins}:${String(rem).padStart(2, '0')}`;
   }
 
-  // Căutare YouTube 100% Client-Side pentru GitHub Pages (cu fallback către backend dacă există)
   async function searchYoutubeVideos(query) {
-    // 1. Încearcă backend-ul local/configurat dacă nu suntem pe github.io fără apiBase
-    const isGitHubPages = window.location.hostname.endsWith('github.io');
     if (!isGitHubPages || configuredApiBase) {
       try {
         const res = await fetch(`${configuredApiBase}/api/search?q=${encodeURIComponent(query)}`);
@@ -91,7 +102,6 @@
       } catch (_) {}
     }
 
-    // 2. Căutare directă din browser prin Piped Public APIs (CORS enabled, funcționează direct pe GitHub Pages)
     for (const base of PUBLIC_PIPED_APIS) {
       try {
         const controller = new AbortController();
@@ -125,14 +135,12 @@
     throw new Error('Serviciul de căutare nu a răspuns. Poți lipi direct link-ul din YouTube!');
   }
 
-  // Preluare detalii videoclip 100% Client-Side pentru GitHub Pages (prin noembed CORS)
   async function fetchVideoMetadata(rawUrlOrId) {
     const videoId = extractVideoId(rawUrlOrId);
     if (!videoId) throw new Error('Link YouTube invalid.');
     const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
     const thumbUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 
-    const isGitHubPages = window.location.hostname.endsWith('github.io');
     if (!isGitHubPages || configuredApiBase) {
       try {
         const res = await fetch(`${configuredApiBase}/api/info?url=${encodeURIComponent(watchUrl)}`);
@@ -168,7 +176,6 @@
     };
   }
 
-  // IndexedDB pentru stocarea melodiilor MP3 direct pe iPhone / Android
   const DB_NAME = 'yt2mp3_library_db';
   const STORE_NAME = 'mp3_files';
 
@@ -282,15 +289,10 @@
 
       for (const item of items) {
         const card = document.createElement('div');
-        card.className = 'library-item';
-        card.style.flexDirection = 'column';
-        card.style.alignItems = 'stretch';
+        card.className = 'library-item library-item-col';
 
         const topRow = document.createElement('div');
-        topRow.style.display = 'flex';
-        topRow.style.alignItems = 'center';
-        topRow.style.justifyContent = 'space-between';
-        topRow.style.gap = '10px';
+        topRow.className = 'library-top-row';
 
         const infoDiv = document.createElement('div');
         infoDiv.className = 'item-info';
@@ -308,8 +310,7 @@
         infoDiv.appendChild(subEl);
 
         const actionsDiv = document.createElement('div');
-        actionsDiv.style.display = 'flex';
-        actionsDiv.style.gap = '6px';
+        actionsDiv.className = 'library-actions';
 
         const shareBtn = document.createElement('button');
         shareBtn.type = 'button';
@@ -353,8 +354,7 @@
     statusCard.classList.remove('hidden');
     statusCard.innerHTML = '';
     const p = document.createElement('p');
-    p.style.margin = '0';
-    p.style.fontWeight = '600';
+    p.className = 'status-text';
     p.textContent = `⏳ ${message}`;
     statusCard.appendChild(p);
   }
@@ -363,32 +363,20 @@
     statusCard.classList.remove('hidden');
     statusCard.innerHTML = '';
     const p = document.createElement('p');
-    p.style.margin = '0';
-    p.style.color = '#ff8a80';
-    p.style.fontWeight = '600';
+    p.className = 'error-text';
     p.textContent = `⚠️ ${message}`;
     statusCard.appendChild(p);
   }
 
-  // Fallback cu buton roșu curat (fără iframe alb!) doar dacă motorul principal nu este pornit
   function appendStaticCloudMp3Widget(container, video) {
-    const widgetWrap = document.createElement('div');
-    widgetWrap.style.marginTop = '8px';
-    widgetWrap.style.display = 'flex';
-    widgetWrap.style.flexDirection = 'column';
-    widgetWrap.style.gap = '8px';
-
     const retryBtn = document.createElement('button');
     retryBtn.type = 'button';
-    retryBtn.className = 'btn btn-primary';
-    retryBtn.style.width = '100%';
+    retryBtn.className = 'btn btn-primary btn-full';
     retryBtn.textContent = '🔄 Reîncearcă Extragerea MP3';
     retryBtn.addEventListener('click', () => {
       startMp3Extraction(video);
     });
-
-    widgetWrap.appendChild(retryBtn);
-    container.appendChild(widgetWrap);
+    container.appendChild(retryBtn);
   }
 
   function showVideoPreviewCard(video) {
@@ -421,8 +409,7 @@
 
     const dlBtn = document.createElement('button');
     dlBtn.type = 'button';
-    dlBtn.className = 'btn btn-primary';
-    dlBtn.style.width = '100%';
+    dlBtn.className = 'btn btn-primary btn-full';
     dlBtn.textContent = '⬇️ Extrage și Descarcă MP3 Acum';
     dlBtn.addEventListener('click', () => {
       startMp3Extraction(video);
@@ -459,9 +446,6 @@
     statusCard.appendChild(progressEl);
     statusCard.appendChild(statusLineEl);
 
-    const isGitHubPages = window.location.hostname.endsWith('github.io');
-
-    // Dacă avem backend local sau configurat, folosim motorul yt-dlp + FFmpeg
     if (!isGitHubPages || configuredApiBase) {
       try {
         const res = await fetch(`${configuredApiBase}/api/jobs`, {
@@ -534,7 +518,6 @@
       } catch (_) {}
     }
 
-    // Fallback 100% Static pentru GitHub Pages (fără niciun server propriu)
     statusCard.innerHTML = '';
     const row = document.createElement('div');
     row.className = 'preview-row';
@@ -644,10 +627,7 @@
 
       const dlBtn = document.createElement('button');
       dlBtn.type = 'button';
-      dlBtn.className = 'btn-icon';
-      dlBtn.style.backgroundColor = 'var(--brand-color)';
-      dlBtn.style.color = '#fff';
-      dlBtn.style.border = 'none';
+      dlBtn.className = 'btn-icon btn-download-pill';
       dlBtn.textContent = '⬇️ MP3';
       dlBtn.addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
