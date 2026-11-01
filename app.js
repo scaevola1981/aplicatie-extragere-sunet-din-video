@@ -11,8 +11,6 @@
   const resultsList = document.getElementById('resultsList');
   const libraryList = document.getElementById('libraryList');
   const libraryCount = document.getElementById('libraryCount');
-  const installHelpBtn = document.getElementById('installHelpBtn');
-  const installBanner = document.getElementById('installBanner');
   const themeToggleBtn = document.getElementById('themeToggleBtn');
   const importMp3Btn = document.getElementById('importMp3Btn');
   const importMp3Input = document.getElementById('importMp3Input');
@@ -121,12 +119,8 @@
     searchForm.addEventListener('change', syncFallbackClasses);
   }
 
-  installHelpBtn.addEventListener('click', () => {
-    installBanner.classList.toggle('hidden');
-  });
-
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=7').catch(() => {});
+    navigator.serviceWorker.register('./sw.js?v=8').catch(() => {});
   }
 
   function getSelectedQuality() {

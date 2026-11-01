@@ -17,13 +17,13 @@
   <meta name="theme-color" content="#161920" media="(prefers-color-scheme: dark)">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="YT2MP3">
   <title>YT2MP3 — Descarcă Muzică MP3 din YouTube</title>
-  <link rel="manifest" href="./manifest.json?v=7">
+  <link rel="manifest" href="./manifest.json?v=8">
   <link rel="icon" type="image/svg+xml" href="./icon.svg">
   <link rel="apple-touch-icon" href="./icon.svg">
-  <link rel="stylesheet" href="./styles.css?v=7">
+  <link rel="stylesheet" href="./styles.css?v=8">
 </head>
 <body>
   <main class="app-container">
@@ -32,29 +32,15 @@
         <img src="./icon.svg" alt="YT2MP3" class="brand-icon">
         <div>
           <h1 class="brand-title">YT2MP3</h1>
-          <p class="brand-subtitle">Neo-Skeuomorphism • White &amp; Dark</p>
+          <p class="brand-subtitle">YouTube Audio Extractor • MP3</p>
         </div>
       </div>
       <div class="header-actions">
         <button type="button" id="themeToggleBtn" class="btn-icon" aria-label="Comută tema White / Dark">
           🌓 Temă
         </button>
-        <button type="button" id="installHelpBtn" class="btn-icon">📲 iPhone</button>
       </div>
     </header>
-
-    <!-- Ghid instalare PWA pe iPhone (fara Xcode / fara expirare la 7 zile) -->
-    <section id="installBanner" class="card install-banner hidden" aria-live="polite">
-      <div>
-        <h2>Instalează ca aplicație pe iPhone (Fără expirare la 7 zile)</h2>
-        <p>
-          1. Deschide acest link în <strong>Safari</strong> pe iPhone.<br>
-          2. Apasă butonul <strong>Share (Distribuie)</strong> din bara de jos.<br>
-          3. Alege <strong>„Adaugă la ecranul principal” (Add to Home Screen)</strong>.<br>
-          Aplicația <strong>YT2MP3</strong> va apărea pe ecranul iPhone-ului ca o aplicație nativă permanentă!
-        </p>
-      </div>
-    </section>
 
     <!-- Card Cautare / Link + Setari -->
     <section class="card">
@@ -130,6 +116,6 @@
     </section>
   </main>
 
-  <script src="./app.js?v=7"></script>
+  <script src="./app.js?v=8"></script>
 </body>
 </html>
