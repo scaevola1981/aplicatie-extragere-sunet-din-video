@@ -16,13 +16,17 @@
   const importMp3Btn = document.getElementById('importMp3Btn');
   const importMp3Input = document.getElementById('importMp3Input');
 
-  // Optional custom backend API URL (e.g. ?api=https://... or localStorage)
+  // Backend API URL (Cloudflare HTTPS Tunnel sau ?api=https://...)
+  const DEFAULT_TUNNEL_API = 'https://docs-receptor-pendant-football.trycloudflare.com';
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.has('api')) {
     const customApi = urlParams.get('api').replace(/\/+$/, '');
     localStorage.setItem('yt2mp3_api_base', customApi);
   }
-  const configuredApiBase = localStorage.getItem('yt2mp3_api_base') || '';
+  const isGitHubPages = window.location.hostname.endsWith('github.io');
+  const configuredApiBase =
+    localStorage.getItem('yt2mp3_api_base') ||
+    (isGitHubPages ? DEFAULT_TUNNEL_API : '');
 
   // Lista de servere publice Piped cu suport CORS pentru GitHub Pages
   const PUBLIC_PIPED_APIS = [
@@ -366,7 +370,7 @@
     statusCard.appendChild(p);
   }
 
-  // Pe GitHub Pages (fără server local), afișează convertorul Cloud MP3 integrat direct în card
+  // Fallback cu buton roșu curat (fără iframe alb!) doar dacă motorul principal nu este pornit
   function appendStaticCloudMp3Widget(container, video) {
     const widgetWrap = document.createElement('div');
     widgetWrap.style.marginTop = '8px';
@@ -374,22 +378,16 @@
     widgetWrap.style.flexDirection = 'column';
     widgetWrap.style.gap = '8px';
 
-    const note = document.createElement('p');
-    note.className = 'preview-sub';
-    note.textContent = 'Mod Static (GitHub Pages): Apasă pe butonul de mai jos pentru a descărca direct fișierul MP3 pe iPhone/Android:';
+    const retryBtn = document.createElement('button');
+    retryBtn.type = 'button';
+    retryBtn.className = 'btn btn-primary';
+    retryBtn.style.width = '100%';
+    retryBtn.textContent = '🔄 Reîncearcă Extragerea MP3';
+    retryBtn.addEventListener('click', () => {
+      startMp3Extraction(video);
+    });
 
-    const iframe = document.createElement('iframe');
-    iframe.src = `https://loader.to/api/button/?url=${encodeURIComponent(video.webpageUrl)}&f=mp3&color=e53935`;
-    iframe.style.width = '100%';
-    iframe.style.height = '62px';
-    iframe.style.border = 'none';
-    iframe.style.borderRadius = '12px';
-    iframe.style.overflow = 'hidden';
-    iframe.setAttribute('scrolling', 'no');
-    iframe.setAttribute('title', `Descarcă MP3 - ${video.title}`);
-
-    widgetWrap.appendChild(note);
-    widgetWrap.appendChild(iframe);
+    widgetWrap.appendChild(retryBtn);
     container.appendChild(widgetWrap);
   }
 
