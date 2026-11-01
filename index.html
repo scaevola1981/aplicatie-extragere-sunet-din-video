@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <!-- MANDATORY: Declare support for both light and dark themes -->
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#e53935">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="YT2MP3">
+  <title>YT2MP3 — Descarcă Muzică MP3 din YouTube</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./icon.svg">
+  <link rel="apple-touch-icon" href="./icon.svg">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="app-container">
+    <header class="top-header">
+      <div class="brand-row">
+        <img src="./icon.svg" alt="YT2MP3" class="brand-icon">
+        <div>
+          <h1 class="brand-title">YT2MP3</h1>
+          <p class="brand-subtitle">iOS &amp; Android PWA • GitHub Pages Ready</p>
+        </div>
+      </div>
+      <button type="button" id="installHelpBtn" class="btn-icon">📲 Cum instalez pe iPhone</button>
+    </header>
+
+    <!-- Ghid instalare PWA pe iPhone (fara Xcode / fara expirare la 7 zile) -->
+    <section id="installBanner" class="card install-banner hidden" aria-live="polite">
+      <div>
+        <h2>Instalează ca aplicație pe iPhone (Fără expirare la 7 zile)</h2>
+        <p>
+          1. Deschide acest link în <strong>Safari</strong> pe iPhone.<br>
+          2. Apasă butonul <strong>Share (Distribuie)</strong> din bara de jos.<br>
+          3. Alege <strong>„Adaugă la ecranul principal” (Add to Home Screen)</strong>.<br>
+          Aplicația <strong>YT2MP3</strong> va apărea pe ecranul iPhone-ului ca o aplicație nativă permanentă!
+        </p>
+      </div>
+    </section>
+
+    <!-- Card Cautare / Link + Setari -->
+    <section class="card">
+      <h2 class="section-label">Caută pe YouTube sau lipește un link</h2>
+      <form id="searchForm">
+        <div class="search-input-wrap">
+          <input
+            type="search"
+            id="queryInput"
+            placeholder="Ex: Coldplay Yellow sau https://youtu.be/..."
+            autocomplete="off"
+            enterkeyhint="search"
+          >
+        </div>
+
+        <div class="btn-row" style="margin-top: 10px;">
+          <button type="button" id="pasteBtn" class="btn btn-secondary">
+            📋 Lipește Link
+          </button>
+          <button type="submit" id="submitBtn" class="btn btn-primary">
+            🔍 Caută / Preia
+          </button>
+        </div>
+
+        <fieldset class="quality-fieldset" style="margin-top: 12px;">
+          <legend class="quality-legend">Calitate Audio MP3:</legend>
+          <div class="quality-options">
+            <label class="radio-label" for="q-best">
+              <input type="radio" id="q-best" name="quality" value="0" checked>
+              <span>Max (~256 kbps)</span>
+            </label>
+            <label class="radio-label" for="q-192">
+              <input type="radio" id="q-192" name="quality" value="192K">
+              <span>192 kbps</span>
+            </label>
+            <label class="radio-label" for="q-128">
+              <input type="radio" id="q-128" name="quality" value="128K">
+              <span>128 kbps</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div style="margin-top: 10px;">
+          <label class="checkbox-label" for="autoDownloadCheck">
+            <input type="checkbox" id="autoDownloadCheck" class="visually-hidden">
+            <span>Pornește descărcarea MP3 automat când lipesc un link</span>
+          </label>
+        </div>
+      </form>
+    </section>
+
+    <!-- Card Stare Activa (Previzualizare / Progres / Finalizat) -->
+    <section id="statusCard" class="card hidden" aria-live="polite"></section>
+
+    <!-- Rezultate Cautare YouTube -->
+    <section id="resultsSection" class="hidden">
+      <h2 id="resultsTitle" class="section-label" style="margin-bottom: 10px;">Rezultate YouTube</h2>
+      <div id="resultsList" class="results-list"></div>
+    </section>
+
+    <!-- Biblioteca Offline MP3 (IndexedDB pe telefon) -->
+    <section>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px;">
+        <h2 class="section-label">🎵 Melodii MP3 Salvate (<span id="libraryCount">0</span>)</h2>
+        <div>
+          <input type="file" id="importMp3Input" accept="audio/mpeg,audio/mp3,audio/*" multiple class="hidden">
+          <button type="button" id="importMp3Btn" class="btn-icon">➕ Importă MP3 în Player</button>
+        </div>
+      </div>
+      <div id="libraryList" class="library-list"></div>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>

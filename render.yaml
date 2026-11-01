@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: yt2mp3-pwa
+    runtime: docker
+    plan: free
+    autoDeploy: true
+
