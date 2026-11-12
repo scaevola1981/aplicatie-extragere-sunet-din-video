@@ -18,3 +18,4 @@ Aceste reguli sunt active permanent și trebuie respectate la fiecare sesiune ș
 4. **Păstrează cerințele UI/UX ale utilizatorului:**
    - Răspunde întotdeauna în **limba română**.
    - Păstrează stilul **Neo-Skeuomorphism** (temele White Porcelain & Dark Obsidian Graphite), protecția **Safe Area (`env(safe-area-inset-top)`)** pentru iPhone Notch / Dynamic Island și nu reintroduce instrucțiunile de instalare.
+

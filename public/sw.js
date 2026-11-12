@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yt2mp3-pwa-v9';
+const CACHE_NAME = 'yt2mp3-pwa-v10';
 const ASSETS = [
   './',
   './index.html',
@@ -15,6 +15,12 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -26,7 +32,7 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
-  if (url.pathname.includes('/api/')) {
+  if (url.pathname.includes('/api/') || url.pathname.endsWith('/version.json')) {
     return;
   }
   event.respondWith(

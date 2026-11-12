@@ -9,7 +9,7 @@ Acest fișier trebuie **citit la începutul fiecărei sesiuni** și **actualizat
 De fiecare dată când utilizatorul îți trimite o cerere nouă în acest proiect:
 
 1. **Citește [`regului.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/regului.md) și [`README.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/README.md)** pentru a ști exact:
-   - Care este **versiunea curentă de cache PWA** (în prezent: **`v9`**).
+   - Care este **versiunea curentă de cache PWA** (în prezent: **`v10`**).
    - Care este **ultimul URL de tunel Cloudflare HTTPS** configurat în `DEFAULT_TUNNEL_API` din [`public/app.js`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/public/app.js).
    - Ce s-a lucrat la ultima intervenție.
 2. **Verifică procesele de fundal (`manage_task` cu `Action: "list"`):**
@@ -52,24 +52,21 @@ Ori de câte ori modifici codul aplicației (HTML, CSS, JS sau backend):
 ## 📊 3. Starea Tehnică la Zi & Ultima Intervenție
 
 - **Data ultimei actualizări:** `12 Noiembrie 2026`
-- **Versiunea PWA curentă:** `v9`
-- **URL Live GitHub Pages:** `https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=9`
+- **Versiunea PWA curentă:** `v10`
+- **URL Live GitHub Pages:** `https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=10`
 - **Server Local (`server.js`):** Port `3080` (`http://localhost:3080`) — activ în fundal (Task ID: `task-389`).
 - **Tunel Cloudflare HTTPS (`cloudflared`):** `https://burst-neo-trinity-truly.trycloudflare.com` — activ în fundal (Task ID: `task-366`).
 
-### Ce am făcut ultima oară (12 Noiembrie 2026 — `v9`):
-1. **Diagnosticare și remediere eroare extragere MP3 (`net::ERR_NAME_NOT_RESOLVED`):**
-   - Vechiul tunel Cloudflare (`docs-receptor-pendant-football.trycloudflare.com`) și procesul `node server.js` se opriseră în urma repornirii sistemului.
-   - Am repornit `node server.js` pe portul `3080` și am deschis un nou tunel Cloudflare HTTPS (`https://burst-neo-trinity-truly.trycloudflare.com`).
-2. **Protecție împotriva expirării tunelului în [`public/app.js`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/public/app.js):**
-   - Am înlocuit apelul către un singur URL fix cu funcția `fetchFromBackend(pathAndQuery, options)`, care testează automat în ordine:
-     1. Tunelul activ (`https://burst-neo-trinity-truly.trycloudflare.com`)
-     2. `http://localhost:3080` și `http://127.0.0.1:3080` (pentru ca pe Mac să funcționeze direct chiar și fără tunel Cloudflare)
-   - Am adăugat ștergerea automată din `localStorage` a URL-urilor vechi `.trycloudflare.com` când se schimbă `DEFAULT_TUNNEL_API`.
-3. **Suport Chrome Private Network Access în [`server.js`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/server.js):**
-   - Am adăugat header-ul `'Access-Control-Allow-Private-Network': 'true'` pe răspunsurile JSON, preflight `OPTIONS` și descărcarea fișierului MP3.
-4. **Documentație și Reguli (`README.md` + `regului.md` + `AGENTS.md`):**
-   - Am actualizat complet [`README.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/README.md) cu arhitectura, comenzile de pornire și istoricul versiunilor `v1`–`v9`.
-   - Am creat acest fișier [`regului.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/regului.md) ca ghid permanent de continuitate între sesiuni.
-   - Am adăugat [`AGENTS.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/AGENTS.md) prin `/learn`, astfel încât Antigravity încarcă automat aceste reguli în `<user_rules>` la începutul fiecărei conversații.
+### Ce am făcut ultima oară (12 Noiembrie 2026 — `v10`):
+1. **Modal nativ de actualizări (`<dialog>` + butoane [Actualizează acum / Mai târziu]):**
+   - Am adăugat elementul nativ `<dialog id="updateDialog" closedby="any">` în [index.html](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/public/index.html) și [app.js](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/public/app.js) cu butoanele de acțiune:
+     - **🚀 Actualizează acum:** descarcă noile actualizări prin Service Worker (`SKIP_WAITING`), șterge cache-ul vechi și reîncarcă instantaneu aplicația la noua versiune.
+     - **⏳ Mai târziu:** închide fereastra și reține decizia temporar (`sessionStorage`) pentru a nu deranja utilizatorul în sesiunea curentă.
+   - Am adăugat butonul dedicat `🔄 v10` în antet pentru a putea redeschide oricând detaliile noilor versiuni.
+2. **Sistem de verificare a actualizărilor (`version.json`):**
+   - Creat `public/version.json` și `version.json` pentru notificarea automată la încărcarea aplicației sau când tab-ul redevine vizibil (`visibilitychange`).
+3. **Conformitate `modern-web-guidance`:**
+   - Respectat ghidurile `dialog`, `light-dismiss-a-dialog` (cu suport nativ `closedby="any"` și fallback bazat pe coordonate pentru click în afara ferestrei) și `prevent-page-scroll-under-modal-dialog` (`overscroll-behavior: contain` pe dialog și `::backdrop`).
+4. **Sincronizare și Cache Busting:**
+   - Copiat toate fișierele din `public/` în rădăcina `/`, incrementat cache-ul la `yt2mp3-pwa-v10` și publicat pe `origin main`.
 

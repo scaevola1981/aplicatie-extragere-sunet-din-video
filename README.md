@@ -2,7 +2,7 @@
 
 Aplicație **Progressive Web App (PWA)** pentru căutarea videoclipurilor pe YouTube și extragerea rapidă a sunetului în format **MP3** (`256 kbps`, `192 kbps`, `128 kbps`), cu bibliotecă audio **100% Offline** (`IndexedDB`) și interfață **Neo-Skeuomorphism** (temă **White Porcelain** & **Dark Obsidian Graphite**).
 
-- 🌐 **URL Live (GitHub Pages):** [https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=9](https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=9)
+- 🌐 **URL Live (GitHub Pages):** [https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=10](https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=10)
 - 📦 **Repository GitHub:** [https://github.com/scaevola1981/aplicatie-extragere-sunet-din-video](https://github.com/scaevola1981/aplicatie-extragere-sunet-din-video)
 - 📋 **Reguli & Jurnal Sesiuni Agent:** [`regului.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/regului.md) & [`AGENTS.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/AGENTS.md)
 
@@ -78,6 +78,11 @@ Fișierele din [`public/`](file:///Users/florindorobantu/Desktop/Aplicatie-trans
 
 ## 📝 Istoric Versiuni (Changelog)
 
+- **`v10` (12 Noiembrie 2026):**
+  - Adăugat modal nativ `<dialog>` cu noile actualizări ale aplicației (`🔄 v10`), ce conține lista îmbunătățirilor și butoanele **[🚀 Actualizează acum]** și **[⏳ Mai târziu]**.
+  - La apăsarea pe `Actualizează acum`, Service Worker-ul curăță cache-urile vechi, forțează activarea noii versiuni (`SKIP_WAITING`) și reîncarcă aplicația cu noile modificări.
+  - Creat fișierul `version.json` pentru verificarea automată a versiunii la pornire și când aplicația revine în prim-plan (`visibilitychange`).
+  - Stilizare Neo-Skeuomorphism pentru modal, suport complet pentru `closedby="any"` (light-dismiss prin click în afara ferestrei) cu fallback JavaScript și scroll containment pe backdrop conform standardelor `modern-web-guidance`.
 - **`v9` (12 Noiembrie 2026):**
   - Repornit `server.js` (port `3080`) și tunelul Cloudflare HTTPS (`https://burst-neo-trinity-truly.trycloudflare.com`) după repornirea sistemului.
   - Adăugat `fetchFromBackend()` în [`public/app.js`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/public/app.js) cu fallback automat pe `http://localhost:3080` și curățarea automată a tunelurilor Cloudflare expirate din `localStorage`.

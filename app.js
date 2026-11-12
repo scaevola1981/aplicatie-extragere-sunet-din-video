@@ -12,6 +12,13 @@
   const libraryList = document.getElementById('libraryList');
   const libraryCount = document.getElementById('libraryCount');
   const themeToggleBtn = document.getElementById('themeToggleBtn');
+  const openUpdateModalBtn = document.getElementById('openUpdateModalBtn');
+  const updateDialog = document.getElementById('updateDialog');
+  const updateVersionBadge = document.getElementById('updateVersionBadge');
+  const updateDialogTitle = document.getElementById('updateDialogTitle');
+  const updateDialogSubtitle = document.getElementById('updateDialogSubtitle');
+  const updateNotesList = document.getElementById('updateNotesList');
+  const updateStatusMsg = document.getElementById('updateStatusMsg');
   const importMp3Btn = document.getElementById('importMp3Btn');
   const importMp3Input = document.getElementById('importMp3Input');
   const colorSchemeMeta = document.querySelector('meta[name="color-scheme"]');
@@ -150,9 +157,173 @@
     searchForm.addEventListener('change', syncFallbackClasses);
   }
 
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=9').catch(() => {});
+  const CURRENT_APP_VERSION = 'v10';
+  let latestVersionInfo = {
+    version: CURRENT_APP_VERSION,
+    date: '12 Noiembrie 2026',
+    title: 'Actualizare Nouă — YT2MP3 v10',
+    subtitle: '12 Noiembrie 2026 • Cele mai noi îmbunătățiri sunt gata de instalare',
+    notes: [
+      '🚀 Sistem inteligent de actualizare în aplicație (Actualizează acum / Mai târziu)',
+      '🎨 Design Neo-Skeuomorphism cu comutator instant ☀️ White / 🌙 Dark',
+      '📱 Protecție Safe Area în partea superioară pentru iPhone Notch & Dynamic Island',
+      '⚡ Extragere MP3 rapidă prin tunel HTTPS Cloudflare + fallback automat Localhost'
+    ]
+  };
+  let swRegistration = null;
+
+  // Fallback for <dialog closedby="any"> in browsers without native closedBy support
+  if (!('closedBy' in HTMLDialogElement.prototype)) {
+    const outside = (e, dialog) => {
+      const r = dialog.getBoundingClientRect();
+      return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+    };
+    for (const dialog of document.querySelectorAll('dialog[closedby="any"]')) {
+      let pressedOutside = false;
+      dialog.addEventListener('pointerdown', (e) => {
+        pressedOutside = outside(e, dialog);
+      });
+      dialog.addEventListener('pointerup', (e) => {
+        if (pressedOutside && outside(e, dialog)) dialog.close();
+      });
+    }
   }
+
+  function renderUpdateDialogContent(info) {
+    if (!updateDialog) return;
+    const ver = info.version || CURRENT_APP_VERSION;
+    if (updateVersionBadge) updateVersionBadge.textContent = `Versiunea ${ver}`;
+    if (updateDialogTitle) updateDialogTitle.textContent = info.title || `Actualizare Nouă — YT2MP3 ${ver}`;
+    if (updateDialogSubtitle) {
+      updateDialogSubtitle.textContent =
+        info.subtitle || `${info.date || ''} • Cele mai noi îmbunătățiri sunt gata de instalare`;
+    }
+    if (updateNotesList && Array.isArray(info.notes) && info.notes.length > 0) {
+      updateNotesList.innerHTML = '';
+      for (const note of info.notes) {
+        const li = document.createElement('li');
+        li.textContent = note;
+        updateNotesList.appendChild(li);
+      }
+    }
+    const ackVer = localStorage.getItem('yt2mp3_ack_version');
+    if (openUpdateModalBtn) {
+      const hasUnapplied = ackVer !== ver;
+      openUpdateModalBtn.textContent = hasUnapplied ? `🔄 ${ver} • Nou` : `🔄 ${ver}`;
+      openUpdateModalBtn.classList.toggle('has-update', hasUnapplied);
+    }
+  }
+
+  async function applyAppUpdateNow() {
+    const targetVer = latestVersionInfo.version || CURRENT_APP_VERSION;
+    try {
+      localStorage.setItem('yt2mp3_ack_version', targetVer);
+      sessionStorage.removeItem('yt2mp3_dismissed_version');
+    } catch (_) {}
+
+    if (updateStatusMsg) {
+      updateStatusMsg.textContent = '⏳ Se descarcă și se aplică noile actualizări...';
+      updateStatusMsg.classList.remove('hidden');
+    }
+
+    try {
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        for (const reg of regs) {
+          try {
+            await reg.update();
+            if (reg.waiting) {
+              reg.waiting.postMessage('SKIP_WAITING');
+            }
+          } catch (_) {}
+        }
+      }
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+    } catch (_) {}
+
+    const nextUrl = new URL(window.location.href);
+    const verNum = String(targetVer).replace(/^v/i, '') || '10';
+    nextUrl.searchParams.set('v', verNum);
+    window.location.replace(nextUrl.toString());
+  }
+
+  async function checkForAppUpdates(forceOpen = false) {
+    try {
+      const res = await fetch(`./version.json?t=${Date.now()}`, { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.version) {
+          latestVersionInfo = data;
+        }
+      }
+    } catch (_) {}
+
+    renderUpdateDialogContent(latestVersionInfo);
+    if (!updateDialog) return;
+
+    const targetVer = latestVersionInfo.version || CURRENT_APP_VERSION;
+    let ackVer = null;
+    let dismissedVer = null;
+    try {
+      ackVer = localStorage.getItem('yt2mp3_ack_version');
+      dismissedVer = sessionStorage.getItem('yt2mp3_dismissed_version');
+    } catch (_) {}
+
+    const shouldPrompt = forceOpen || (ackVer !== targetVer && dismissedVer !== targetVer);
+    if (shouldPrompt && !updateDialog.open) {
+      if (updateStatusMsg) updateStatusMsg.classList.add('hidden');
+      updateDialog.showModal();
+    }
+  }
+
+  if (openUpdateModalBtn && updateDialog) {
+    openUpdateModalBtn.addEventListener('click', () => {
+      checkForAppUpdates(true);
+    });
+
+    updateDialog.addEventListener('close', () => {
+      const choice = updateDialog.returnValue;
+      updateDialog.returnValue = '';
+      const targetVer = latestVersionInfo.version || CURRENT_APP_VERSION;
+
+      if (choice === 'update-now') {
+        applyAppUpdateNow();
+      } else {
+        try {
+          sessionStorage.setItem('yt2mp3_dismissed_version', targetVer);
+        } catch (_) {}
+        renderUpdateDialogContent(latestVersionInfo);
+      }
+    });
+  }
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .register('./sw.js?v=10')
+      .then((reg) => {
+        swRegistration = reg;
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          if (!newWorker) return;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              checkForAppUpdates(true);
+            }
+          });
+        });
+      })
+      .catch(() => {});
+  }
+
+  checkForAppUpdates(false);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      checkForAppUpdates(false);
+    }
+  });
 
   function getSelectedQuality() {
     const checked = document.querySelector('input[name="quality"]:checked');
