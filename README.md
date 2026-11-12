@@ -2,7 +2,7 @@
 
 Aplicație **Progressive Web App (PWA)** pentru căutarea videoclipurilor pe YouTube și extragerea rapidă a sunetului în format **MP3** (`256 kbps`, `192 kbps`, `128 kbps`), cu bibliotecă audio **100% Offline** (`IndexedDB`) și interfață **Neo-Skeuomorphism** (temă **White Porcelain** & **Dark Obsidian Graphite**).
 
-- 🌐 **URL Live (GitHub Pages):** [https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=10](https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=10)
+- 🌐 **URL Live (GitHub Pages):** [https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=11](https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=11)
 - 📦 **Repository GitHub:** [https://github.com/scaevola1981/aplicatie-extragere-sunet-din-video](https://github.com/scaevola1981/aplicatie-extragere-sunet-din-video)
 - 📋 **Reguli & Jurnal Sesiuni Agent:** [`regului.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/regului.md) & [`AGENTS.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/AGENTS.md)
 
@@ -78,6 +78,10 @@ Fișierele din [`public/`](file:///Users/florindorobantu/Desktop/Aplicatie-trans
 
 ## 📝 Istoric Versiuni (Changelog)
 
+- **`v11` (12 Noiembrie 2026):**
+  - Repornit tunelul HTTPS Cloudflare activ (`https://locks-uniform-residents-influenced.trycloudflare.com`) pentru restabilirea descărcărilor pe telefonul altor utilizatori.
+  - Creat scriptul de pornire automată [`start-server.sh`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/start-server.sh) pentru control rapid local sau prin SSH/Comenzi Rapide de pe iPhone prin Tailscale (`100.97.95.82`).
+  - Pregătit suportul pentru Tailscale Funnel.
 - **`v10` (12 Noiembrie 2026):**
   - Adăugat modal nativ `<dialog>` cu noile actualizări ale aplicației (`🔄 v10`), ce conține lista îmbunătățirilor și butoanele **[🚀 Actualizează acum]** și **[⏳ Mai târziu]**.
   - La apăsarea pe `Actualizează acum`, Service Worker-ul curăță cache-urile vechi, forțează activarea noii versiuni (`SKIP_WAITING`) și reîncarcă aplicația cu noile modificări.

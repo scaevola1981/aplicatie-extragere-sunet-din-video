@@ -91,7 +91,7 @@
   }
 
   // Backend API URL (Cloudflare HTTPS Tunnel + Localhost fallback sau ?api=https://...)
-  const DEFAULT_TUNNEL_API = 'https://burst-neo-trinity-truly.trycloudflare.com';
+  const DEFAULT_TUNNEL_API = 'https://locks-uniform-residents-influenced.trycloudflare.com';
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.has('api')) {
     const customApi = urlParams.get('api').replace(/\/+$/, '');
@@ -157,17 +157,17 @@
     searchForm.addEventListener('change', syncFallbackClasses);
   }
 
-  const CURRENT_APP_VERSION = 'v10';
+  const CURRENT_APP_VERSION = 'v11';
   let latestVersionInfo = {
     version: CURRENT_APP_VERSION,
     date: '12 Noiembrie 2026',
-    title: 'Actualizare Nouă — YT2MP3 v10',
-    subtitle: '12 Noiembrie 2026 • Cele mai noi îmbunătățiri sunt gata de instalare',
+    title: 'Actualizare Nouă — YT2MP3 v11',
+    subtitle: '12 Noiembrie 2026 • Tunel activ Cloudflare & suport Tailscale',
     notes: [
+      '⚡ Tunel HTTPS Cloudflare nou activat pentru descărcări rapide pe mobil',
       '🚀 Sistem inteligent de actualizare în aplicație (Actualizează acum / Mai târziu)',
       '🎨 Design Neo-Skeuomorphism cu comutator instant ☀️ White / 🌙 Dark',
-      '📱 Protecție Safe Area în partea superioară pentru iPhone Notch & Dynamic Island',
-      '⚡ Extragere MP3 rapidă prin tunel HTTPS Cloudflare + fallback automat Localhost'
+      '📱 Protecție Safe Area în partea superioară pentru iPhone Notch & Dynamic Island'
     ]
   };
   let swRegistration = null;
@@ -302,7 +302,7 @@
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker
-      .register('./sw.js?v=10')
+      .register('./sw.js?v=11')
       .then((reg) => {
         swRegistration = reg;
         reg.addEventListener('updatefound', () => {
