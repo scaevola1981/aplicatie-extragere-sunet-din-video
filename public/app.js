@@ -83,17 +83,48 @@
     });
   }
 
-  // Backend API URL (Cloudflare HTTPS Tunnel sau ?api=https://...)
-  const DEFAULT_TUNNEL_API = 'https://docs-receptor-pendant-football.trycloudflare.com';
+  // Backend API URL (Cloudflare HTTPS Tunnel + Localhost fallback sau ?api=https://...)
+  const DEFAULT_TUNNEL_API = 'https://burst-neo-trinity-truly.trycloudflare.com';
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.has('api')) {
     const customApi = urlParams.get('api').replace(/\/+$/, '');
     localStorage.setItem('yt2mp3_api_base', customApi);
   }
   const isGitHubPages = window.location.hostname.endsWith('github.io');
-  const configuredApiBase =
-    localStorage.getItem('yt2mp3_api_base') ||
-    (isGitHubPages ? DEFAULT_TUNNEL_API : '');
+  const storedApiBase = localStorage.getItem('yt2mp3_api_base') || '';
+  if (storedApiBase.includes('trycloudflare.com') && storedApiBase !== DEFAULT_TUNNEL_API && !urlParams.has('api')) {
+    localStorage.removeItem('yt2mp3_api_base');
+  }
+  let activeApiBase = null;
+
+  function getApiCandidates() {
+    if (!isGitHubPages) return [''];
+    const custom = localStorage.getItem('yt2mp3_api_base') || '';
+    const raw = [activeApiBase, custom, DEFAULT_TUNNEL_API, 'http://localhost:3080', 'http://127.0.0.1:3080'];
+    const seen = new Set();
+    const list = [];
+    for (const item of raw) {
+      if (typeof item === 'string' && item.length > 0 && !seen.has(item)) {
+        seen.add(item);
+        list.push(item);
+      }
+    }
+    return list;
+  }
+
+  async function fetchFromBackend(pathAndQuery, options = {}) {
+    const candidates = getApiCandidates();
+    for (const base of candidates) {
+      try {
+        const res = await fetch(`${base}${pathAndQuery}`, options);
+        if (res.ok) {
+          activeApiBase = base;
+          return { res, base };
+        }
+      } catch (_) {}
+    }
+    return null;
+  }
 
   const PUBLIC_PIPED_APIS = [
     'https://api.piped.private.coffee',
@@ -120,7 +151,7 @@
   }
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=8').catch(() => {});
+    navigator.serviceWorker.register('./sw.js?v=9').catch(() => {});
   }
 
   function getSelectedQuality() {
@@ -151,14 +182,12 @@
   }
 
   async function searchYoutubeVideos(query) {
-    if (!isGitHubPages || configuredApiBase) {
+    const backendHit = await fetchFromBackend(`/api/search?q=${encodeURIComponent(query)}`);
+    if (backendHit) {
       try {
-        const res = await fetch(`${configuredApiBase}/api/search?q=${encodeURIComponent(query)}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data.results) && data.results.length > 0) {
-            return data.results;
-          }
+        const data = await backendHit.res.json();
+        if (Array.isArray(data.results) && data.results.length > 0) {
+          return data.results;
         }
       } catch (_) {}
     }
@@ -202,13 +231,11 @@
     const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
     const thumbUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 
-    if (!isGitHubPages || configuredApiBase) {
+    const backendHit = await fetchFromBackend(`/api/info?url=${encodeURIComponent(watchUrl)}`);
+    if (backendHit) {
       try {
-        const res = await fetch(`${configuredApiBase}/api/info?url=${encodeURIComponent(watchUrl)}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.video) return data.video;
-        }
+        const data = await backendHit.res.json();
+        if (data.video) return data.video;
       } catch (_) {}
     }
 
@@ -507,75 +534,75 @@
     statusCard.appendChild(progressEl);
     statusCard.appendChild(statusLineEl);
 
-    if (!isGitHubPages || configuredApiBase) {
+    const jobStartHit = await fetchFromBackend('/api/jobs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: video.webpageUrl,
+        quality: getSelectedQuality(),
+        title: video.title
+      })
+    });
+
+    if (jobStartHit) {
       try {
-        const res = await fetch(`${configuredApiBase}/api/jobs`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            url: video.webpageUrl,
-            quality: getSelectedQuality(),
-            title: video.title
-          })
-        });
-        if (res.ok) {
-          const data = await res.json();
-          const jobId = data.id;
-          activePollTimer = setInterval(async () => {
-            try {
-              const pollRes = await fetch(`${configuredApiBase}/api/jobs/${jobId}`);
-              const job = await pollRes.json();
-              if (!pollRes.ok) {
-                throw new Error(job.error || 'Eroare la verificarea progresului.');
-              }
+        const { res, base } = jobStartHit;
+        const data = await res.json();
+        const jobId = data.id;
+        activePollTimer = setInterval(async () => {
+          try {
+            const pollRes = await fetch(`${base}/api/jobs/${jobId}`);
+            const job = await pollRes.json();
+            if (!pollRes.ok) {
+              throw new Error(job.error || 'Eroare la verificarea progresului.');
+            }
 
-              progressEl.value = job.progress || 10;
-              statusLineEl.textContent = `${job.statusText} (${job.progress || 0}%)`;
+            progressEl.value = job.progress || 10;
+            statusLineEl.textContent = `${job.statusText} (${job.progress || 0}%)`;
 
-              if (job.status === 'completed') {
-                clearInterval(activePollTimer);
-                activePollTimer = null;
-
-                statusLineEl.textContent = 'Se salvează fișierul MP3 pe telefon...';
-                const fileRes = await fetch(`${configuredApiBase}/api/jobs/${jobId}/file`);
-                if (!fileRes.ok) {
-                  throw new Error('Nu s-a putut prelua fișierul MP3.');
-                }
-                const mp3Blob = await fileRes.blob();
-                const fileName = job.fileName || `${video.title}.mp3`;
-
-                await saveMp3ToLibrary({ fileName, blob: mp3Blob });
-                await renderLibrary();
-                triggerBrowserDownload(mp3Blob, fileName);
-
-                statusCard.innerHTML = '';
-                const doneTitle = document.createElement('p');
-                doneTitle.className = 'preview-title';
-                doneTitle.textContent = `✅ Descărcat: ${fileName}`;
-
-                const shareBtn = document.createElement('button');
-                shareBtn.type = 'button';
-                shareBtn.className = 'btn btn-success';
-                shareBtn.textContent = '📂 Salvează în Fișiere (iPhone) / Trimite pe WhatsApp';
-                shareBtn.addEventListener('click', () => {
-                  shareOrSaveOnIphone(mp3Blob, fileName);
-                });
-
-                statusCard.appendChild(doneTitle);
-                statusCard.appendChild(shareBtn);
-              } else if (job.status === 'error') {
-                clearInterval(activePollTimer);
-                activePollTimer = null;
-                showErrorCard(job.error || 'Conversia MP3 a eșuat.');
-              }
-            } catch (err) {
+            if (job.status === 'completed') {
               clearInterval(activePollTimer);
               activePollTimer = null;
-              showErrorCard(err.message);
+
+              statusLineEl.textContent = 'Se salvează fișierul MP3 pe telefon...';
+              const fileRes = await fetch(`${base}/api/jobs/${jobId}/file`);
+              if (!fileRes.ok) {
+                throw new Error('Nu s-a putut prelua fișierul MP3.');
+              }
+              const mp3Blob = await fileRes.blob();
+              const fileName = job.fileName || `${video.title}.mp3`;
+
+              await saveMp3ToLibrary({ fileName, blob: mp3Blob });
+              await renderLibrary();
+              triggerBrowserDownload(mp3Blob, fileName);
+
+              statusCard.innerHTML = '';
+              const doneTitle = document.createElement('p');
+              doneTitle.className = 'preview-title';
+              doneTitle.textContent = `✅ Descărcat: ${fileName}`;
+
+              const shareBtn = document.createElement('button');
+              shareBtn.type = 'button';
+              shareBtn.className = 'btn btn-success';
+              shareBtn.textContent = '📂 Salvează în Fișiere (iPhone) / Trimite pe WhatsApp';
+              shareBtn.addEventListener('click', () => {
+                shareOrSaveOnIphone(mp3Blob, fileName);
+              });
+
+              statusCard.appendChild(doneTitle);
+              statusCard.appendChild(shareBtn);
+            } else if (job.status === 'error') {
+              clearInterval(activePollTimer);
+              activePollTimer = null;
+              showErrorCard(job.error || 'Conversia MP3 a eșuat.');
             }
-          }, 650);
-          return;
-        }
+          } catch (err) {
+            clearInterval(activePollTimer);
+            activePollTimer = null;
+            showErrorCard(err.message);
+          }
+        }, 650);
+        return;
       } catch (_) {}
     }
 
