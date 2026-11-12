@@ -4,7 +4,7 @@ Aplicație **Progressive Web App (PWA)** pentru căutarea videoclipurilor pe You
 
 - 🌐 **URL Live (GitHub Pages):** [https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=9](https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=9)
 - 📦 **Repository GitHub:** [https://github.com/scaevola1981/aplicatie-extragere-sunet-din-video](https://github.com/scaevola1981/aplicatie-extragere-sunet-din-video)
-- 📋 **Reguli & Jurnal Sesiuni Agent:** [`regului.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/regului.md)
+- 📋 **Reguli & Jurnal Sesiuni Agent:** [`regului.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/regului.md) & [`AGENTS.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/AGENTS.md)
 
 ---
 
@@ -72,6 +72,7 @@ Fișierele din [`public/`](file:///Users/florindorobantu/Desktop/Aplicatie-trans
 - [`public/manifest.json`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/public/manifest.json) & [`manifest.json`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/manifest.json) — Configurația Web App Manifest pentru instalarea pe iOS și Android.
 - [`server.js`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/server.js) — Serverul Node.js (port `3080`) care orchestrează `yt-dlp` și `FFmpeg` pentru extragerea MP3.
 - [`regului.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/regului.md) — Reguli obligatorii de lucru și jurnalul la zi pentru agentul AI.
+- [`AGENTS.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/AGENTS.md) — Regulă de sistem Antigravity (`always_on`) creată prin `/learn` care încarcă automat instrucțiunile de continuitate la fiecare sesiune.
 
 ---
 

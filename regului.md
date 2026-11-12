@@ -68,6 +68,8 @@ Ori de câte ori modifici codul aplicației (HTML, CSS, JS sau backend):
    - Am adăugat ștergerea automată din `localStorage` a URL-urilor vechi `.trycloudflare.com` când se schimbă `DEFAULT_TUNNEL_API`.
 3. **Suport Chrome Private Network Access în [`server.js`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/server.js):**
    - Am adăugat header-ul `'Access-Control-Allow-Private-Network': 'true'` pe răspunsurile JSON, preflight `OPTIONS` și descărcarea fișierului MP3.
-4. **Documentație și Reguli (`README.md` + `regului.md`):**
+4. **Documentație și Reguli (`README.md` + `regului.md` + `AGENTS.md`):**
    - Am actualizat complet [`README.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/README.md) cu arhitectura, comenzile de pornire și istoricul versiunilor `v1`–`v9`.
    - Am creat acest fișier [`regului.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/regului.md) ca ghid permanent de continuitate între sesiuni.
+   - Am adăugat [`AGENTS.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/AGENTS.md) prin `/learn`, astfel încât Antigravity încarcă automat aceste reguli în `<user_rules>` la începutul fiecărei conversații.
+
