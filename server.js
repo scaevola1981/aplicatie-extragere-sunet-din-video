@@ -604,16 +604,20 @@ const server = http.createServer(async (req, res) => {
       const stat = fs.statSync(job.filePath);
       const asciiFallback = job.fileName.replace(/[^\x20-\x7E]+/g, '_');
       const encodedName = encodeURIComponent(job.fileName);
+      const isInline = parsedUrl.searchParams.get('inline') === '1';
 
-      res.writeHead(200, {
+      const fileHeaders = {
         'Content-Type': 'audio/mpeg',
         'Content-Length': stat.size,
-        'Content-Disposition': `attachment; filename="${asciiFallback}"; filename*=UTF-8''${encodedName}`,
         'Cache-Control': 'no-store',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Private-Network': 'true'
-      });
+      };
+      if (!isInline) {
+        fileHeaders['Content-Disposition'] = `attachment; filename="${asciiFallback}"; filename*=UTF-8''${encodedName}`;
+      }
 
+      res.writeHead(200, fileHeaders);
       fs.createReadStream(job.filePath).pipe(res);
       return;
     }

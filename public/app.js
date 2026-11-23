@@ -157,17 +157,17 @@
     searchForm.addEventListener('change', syncFallbackClasses);
   }
 
-  const CURRENT_APP_VERSION = 'v14';
+  const CURRENT_APP_VERSION = 'v15';
   let latestVersionInfo = {
     version: CURRENT_APP_VERSION,
     date: '23 Noiembrie 2026',
-    title: 'Actualizare Nouă — YT2MP3 v14 (Fix iOS)',
-    subtitle: '23 Noiembrie 2026 • Salvare MP3 instantă pe iPhone & buton Actualizare reparat',
+    title: 'Actualizare Nouă — YT2MP3 v15 (Descărcare Instantă iOS)',
+    subtitle: '23 Noiembrie 2026 • Eliminat complet blocajul la descărcare pe iPhone',
     notes: [
-      '📱 Reparat blocajul „Se salvează fișierul MP3 pe telefon...” pe iPhone / Safari',
-      '📥 Adăugat buton direct de descărcare MP3 + Salvare în Fișiere pe iOS',
-      '🔄 Reparat butonul „Actualizează acum” pentru reîncărcare garantată pe iOS PWA',
-      '🔒 Adresă HTTPS permanentă 24/7 (Tailscale Funnel + serviciu automat macOS)'
+      '⚡ Afișare instantă a butonului „Descarcă MP3” imediat ce conversia ajunge la 100%',
+      '🎧 Previzualizare audio direct în card + descărcare nativă Safari (fără blocare)',
+      '📂 Salvare offline în bibliotecă în fundal (nu mai blochează ecranul)',
+      '🔒 Conexiune HTTPS permanentă 24/7 prin Tailscale Funnel'
     ]
   };
   let swRegistration = null;
@@ -300,7 +300,7 @@
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker
-      .register('./sw.js?v=14')
+      .register('./sw.js?v=15')
       .then((reg) => {
         swRegistration = reg;
         reg.addEventListener('updatefound', () => {
@@ -740,56 +740,78 @@
               }
 
               const directFileUrl = `${base}/api/jobs/${jobId}/file`;
+              const inlineFileUrl = `${base}/api/jobs/${jobId}/file?inline=1`;
               const fileName = job.fileName || `${video.title}.mp3`;
-              statusLineEl.textContent = 'Se descarcă fișierul MP3 de pe server...';
-
-              let mp3Blob = null;
-              try {
-                const fileRes = await fetch(directFileUrl);
-                if (!fileRes.ok) {
-                  throw new Error('Nu s-a putut prelua fișierul MP3.');
-                }
-                mp3Blob = await fileRes.blob();
-              } catch (_) {}
-
-              if (mp3Blob) {
-                try {
-                  await Promise.race([
-                    saveMp3ToLibrary({ fileName, blob: mp3Blob }),
-                    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
-                  ]);
-                  await renderLibrary();
-                } catch (_) {}
-
-                try {
-                  triggerBrowserDownload(mp3Blob, fileName);
-                } catch (_) {}
-              }
+              let cachedBlob = null;
 
               statusCard.innerHTML = '';
+
               const doneTitle = document.createElement('p');
               doneTitle.className = 'preview-title';
               doneTitle.textContent = `✅ Gata: ${fileName}`;
               statusCard.appendChild(doneTitle);
 
-              if (mp3Blob) {
-                const shareBtn = document.createElement('button');
-                shareBtn.type = 'button';
-                shareBtn.className = 'btn btn-success';
-                shareBtn.textContent = '📂 Salvează în Fișiere (iPhone) / Trimite pe WhatsApp';
-                shareBtn.addEventListener('click', () => {
-                  shareOrSaveOnIphone(mp3Blob, fileName);
-                });
-                statusCard.appendChild(shareBtn);
-              }
+              const audioPreview = document.createElement('audio');
+              audioPreview.controls = true;
+              audioPreview.preload = 'metadata';
+              audioPreview.className = 'player-bar';
+              audioPreview.src = inlineFileUrl;
+              statusCard.appendChild(audioPreview);
 
               const directLink = document.createElement('a');
               directLink.href = directFileUrl;
               directLink.download = fileName;
-              directLink.className = 'btn btn-secondary btn-full';
+              directLink.className = 'btn btn-primary btn-full';
               directLink.style.textDecoration = 'none';
-              directLink.textContent = '⬇️ Descarcă MP3 Direct (Safari / Fișiere)';
+              directLink.textContent = '⬇️ Descarcă MP3 pe Telefon (Instant)';
               statusCard.appendChild(directLink);
+
+              const shareBtn = document.createElement('button');
+              shareBtn.type = 'button';
+              shareBtn.className = 'btn btn-success';
+              shareBtn.textContent = '📂 Salvează în Fișiere / Trimite pe WhatsApp';
+              shareBtn.addEventListener('click', async () => {
+                shareBtn.disabled = true;
+                const oldLabel = shareBtn.textContent;
+                shareBtn.textContent = '⏳ Se pregătește fișierul...';
+                try {
+                  if (!cachedBlob) {
+                    const controller = new AbortController();
+                    const t = setTimeout(() => controller.abort(), 20000);
+                    const r = await fetch(inlineFileUrl, { signal: controller.signal });
+                    clearTimeout(t);
+                    if (r.ok) cachedBlob = await r.blob();
+                  }
+                  if (cachedBlob) {
+                    await shareOrSaveOnIphone(cachedBlob, fileName);
+                  } else {
+                    window.location.href = directFileUrl;
+                  }
+                } catch (_) {
+                  window.location.href = directFileUrl;
+                } finally {
+                  shareBtn.disabled = false;
+                  shareBtn.textContent = oldLabel;
+                }
+              });
+              statusCard.appendChild(shareBtn);
+
+              // Salvare non-blocanta in biblioteca offline in fundal
+              (async () => {
+                try {
+                  const controller = new AbortController();
+                  const t = setTimeout(() => controller.abort(), 20000);
+                  const r = await fetch(inlineFileUrl, { signal: controller.signal });
+                  clearTimeout(t);
+                  if (!r.ok) return;
+                  cachedBlob = await r.blob();
+                  await Promise.race([
+                    saveMp3ToLibrary({ fileName, blob: cachedBlob }),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+                  ]);
+                  await renderLibrary();
+                } catch (_) {}
+              })();
               return;
             } else if (job.status === 'error') {
               isStopped = true;

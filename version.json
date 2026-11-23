@@ -1,12 +1,12 @@
 {
-  "version": "v14",
+  "version": "v15",
   "date": "23 Noiembrie 2026",
-  "title": "Actualizare Nouă — YT2MP3 v14 (Fix iOS)",
-  "subtitle": "23 Noiembrie 2026 • Salvare MP3 instantă pe iPhone & buton Actualizare reparat",
+  "title": "Actualizare Nouă — YT2MP3 v15 (Descărcare Instantă iOS)",
+  "subtitle": "23 Noiembrie 2026 • Eliminat complet blocajul la descărcare pe iPhone",
   "notes": [
-    "📱 Reparat blocajul „Se salvează fișierul MP3 pe telefon...” pe iPhone / Safari",
-    "📥 Adăugat buton direct de descărcare MP3 + Salvare în Fișiere pe iOS",
-    "🔄 Reparat butonul „Actualizează acum” pentru reîncărcare garantată pe iOS PWA",
-    "🔒 Adresă HTTPS permanentă 24/7 (Tailscale Funnel + serviciu automat macOS)"
+    "⚡ Afișare instantă a butonului „Descarcă MP3” imediat ce conversia ajunge la 100%",
+    "🎧 Previzualizare audio direct în card + descărcare nativă Safari (fără blocare)",
+    "📂 Salvare offline în bibliotecă în fundal (nu mai blochează ecranul)",
+    "🔒 Conexiune HTTPS permanentă 24/7 prin Tailscale Funnel"
   ]
 }

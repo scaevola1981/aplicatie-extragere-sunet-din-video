@@ -2,7 +2,7 @@
 
 Aplicație **Progressive Web App (PWA)** pentru căutarea videoclipurilor pe YouTube și extragerea rapidă a sunetului în format **MP3** (`256 kbps`, `192 kbps`, `128 kbps`), cu bibliotecă audio **100% Offline** (`IndexedDB`) și interfață **Neo-Skeuomorphism** (temă **White Porcelain** & **Dark Obsidian Graphite**).
 
-- 🌐 **URL Live (GitHub Pages):** [https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=14](https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=14)
+- 🌐 **URL Live (GitHub Pages):** [https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=15](https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=15)
 - 🔒 **URL Direct Permanent (Tailscale Funnel 24/7):** [https://mac-mini-florin.tail1bff6a.ts.net](https://mac-mini-florin.tail1bff6a.ts.net)
 - 📦 **Repository GitHub:** [https://github.com/scaevola1981/aplicatie-extragere-sunet-din-video](https://github.com/scaevola1981/aplicatie-extragere-sunet-din-video)
 - 📋 **Reguli & Jurnal Sesiuni Agent:** [`regului.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/regului.md) & [`AGENTS.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/AGENTS.md)
@@ -79,6 +79,8 @@ Fișierele din [`public/`](file:///Users/florindorobantu/Desktop/Aplicatie-trans
 
 ## 📝 Istoric Versiuni (Changelog)
 
+- **`v15` (23 Noiembrie 2026):**
+  - Eliminat complet blocajul pe `Se descarcă fișierul MP3 de pe server...` pe iPhone: imediat ce conversia ajunge la `100%`, cardul afișează instantaneu playerul audio (`?inline=1`), butonul nativ **⬇️ Descarcă MP3 pe Telefon (Instant)** și butonul **📂 Salvează în Fișiere / WhatsApp**, iar salvarea offline în `IndexedDB` rulează în fundal fără să blocheze interfața.
 - **`v14` (23 Noiembrie 2026):**
   - Reparat blocajul `Se salvează fișierul MP3 pe telefon...` pe iPhone / Safari: înlocuit `setInterval` suprapus cu polling secvențial `setTimeout`, adăugat timeout de 5s la salvarea în `IndexedDB` și buton direct de descărcare MP3 (`<a download>`) pe lângă `navigator.share`.
   - Reparat butonul `🚀 Actualizează acum` pe iOS PWA: dezînregistrare Service Worker vechi, curățare cache și navigare cu parametru unic `?v=14&r=...` pentru reîncărcare garantată.
