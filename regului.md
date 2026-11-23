@@ -9,8 +9,8 @@ Acest fișier trebuie **citit la începutul fiecărei sesiuni** și **actualizat
 De fiecare dată când utilizatorul îți trimite o cerere nouă în acest proiect:
 
 1. **Citește [`regului.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/regului.md) și [`README.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/README.md)** pentru a ști exact:
-   - Care este **versiunea curentă de cache PWA** (în prezent: **`v12`**).
-   - Care este **URL-ul de backend Cloud Render.com** configurat în `DEFAULT_TUNNEL_API` din [`public/app.js`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/public/app.js) (`https://aplicatie-extragere-sunet-din-video.onrender.com`).
+   - Care este **versiunea curentă de cache PWA** (în prezent: **`v13`**).
+   - Care este **URL-ul permanent de backend (Tailscale Funnel)** configurat în `DEFAULT_TUNNEL_API` din [`public/app.js`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/public/app.js) (`https://mac-mini-florin.tail1bff6a.ts.net`).
    - Ce s-a lucrat la ultima intervenție.
 2. **Verifică procesele de fundal (`manage_task` cu `Action: "list"`):**
    - Verifică dacă **`node server.js`** rulează pe portul `3080`.
@@ -52,17 +52,16 @@ Ori de câte ori modifici codul aplicației (HTML, CSS, JS sau backend):
 ## 📊 3. Starea Tehnică la Zi & Ultima Intervenție
 
 - **Data ultimei actualizări:** `23 Noiembrie 2026`
-- **Versiunea PWA curentă:** `v12`
-- **URL Live GitHub Pages:** `https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=12`
-- **Server Cloud 24/7 (Render.com):** `https://aplicatie-extragere-sunet-din-video.onrender.com` (auto-deploy din `main` via `Dockerfile`).
-- **Tailscale IP Mac:** `100.97.95.82` (`mac-mini-florin`).
+- **Versiunea PWA curentă:** `v13`
+- **URL Live GitHub Pages:** `https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=13`
+- **URL Permanent Tailscale Funnel (Mac mini 24/7):** `https://mac-mini-florin.tail1bff6a.ts.net` (`proxy http://127.0.0.1:3080`, activ permanent în fundal).
+- **Serviciu macOS (`launchd`):** `com.florin.yt2mp3.server` (instalare/actualizare prin `./install-mac-service.sh`, rulează din `~/.yt2mp3-service` chiar și cu proiectul și Antigravity închise).
 
-### Ce am făcut ultima oară (23 Noiembrie 2026 — `v12`):
-1. **Deploy pe Render.com (Cloud 24/7 independent de Mac):**
-   - Serviciul `aplicatie-extragere-sunet-din-video` a fost publicat pe Render (Docker, Frankfurt EU Central, Free Plan) la `https://aplicatie-extragere-sunet-din-video.onrender.com`.
-   - Am actualizat `DEFAULT_TUNNEL_API` din `public/app.js` către serverul Render.com.
-2. **Protecție anti-bot YouTube pentru IP-uri de datacenter în [`server.js`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/server.js):**
-   - Adăugat încercări automate cu `player_client=android_vr`, `tv`, `ios`, suport pentru variabile de mediu `YOUTUBE_COOKIES` / `YOUTUBE_COOKIES_BASE64`, și fallback automat prin Piped audio streams + `FFmpeg`.
-3. **Sincronizare PWA v12 pe GitHub Pages + Render Auto-Deploy:**
-   - Actualizat cache la `v12` în `index.html`, `app.js`, `sw.js`, `version.json`, copiat în rădăcină, actualizat `README.md` și `regului.md` și publicat pe `origin main`.
+### Ce am făcut ultima oară (23 Noiembrie 2026 — `v13`):
+1. **Serviciu invizibil macOS (`launchd`):**
+   - Creat [`install-mac-service.sh`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/install-mac-service.sh) care copiază runtime-ul în `~/.yt2mp3-service` (evitând restricțiile TCC de pe Desktop) și configurează `~/Library/LaunchAgents/com.florin.yt2mp3.server.plist` cu `RunAtLoad` + `KeepAlive`.
+2. **Tailscale Funnel permanent activat (`https://mac-mini-florin.tail1bff6a.ts.net`):**
+   - Expune portul `3080` pe internet cu certificat HTTPS permanent, fără blocaje anti-bot YouTube (folosește IP-ul rezidențial de acasă) și fără a depinde de deschiderea proiectului.
+3. **Sincronizare PWA v13 pe GitHub Pages + `~/.yt2mp3-service`:**
+   - Actualizat `DEFAULT_TUNNEL_API`, `version.json`, `sw.js`, `index.html`, `README.md` și `regului.md` la `v13` și publicat pe `origin main`.
 

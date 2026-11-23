@@ -90,8 +90,8 @@
     });
   }
 
-  // Backend API URL (Server Cloud 24/7 Render.com + Localhost fallback sau ?api=https://...)
-  const DEFAULT_TUNNEL_API = 'https://aplicatie-extragere-sunet-din-video.onrender.com';
+  // Backend API URL (Permanent Tailscale Funnel HTTPS + Localhost fallback sau ?api=https://...)
+  const DEFAULT_TUNNEL_API = 'https://mac-mini-florin.tail1bff6a.ts.net';
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.has('api')) {
     const customApi = urlParams.get('api').replace(/\/+$/, '');
@@ -157,15 +157,15 @@
     searchForm.addEventListener('change', syncFallbackClasses);
   }
 
-  const CURRENT_APP_VERSION = 'v12';
+  const CURRENT_APP_VERSION = 'v13';
   let latestVersionInfo = {
     version: CURRENT_APP_VERSION,
     date: '23 Noiembrie 2026',
-    title: 'Actualizare Nouă — YT2MP3 v12 (Cloud 24/7)',
-    subtitle: '23 Noiembrie 2026 • Server Cloud Render.com — 100% independent de Mac',
+    title: 'Actualizare Nouă — YT2MP3 v13 (Permanent 24/7)',
+    subtitle: '23 Noiembrie 2026 • Adresă HTTPS fixă permanentă + serviciu automat macOS',
     notes: [
-      '☁️ Server Cloud permanent pe Render.com (funcționează 24/7 fără Mac pornit)',
-      '⚡ Extragere MP3 multi-strategie (yt-dlp + fallback automat Piped & FFmpeg)',
+      '🔒 Adresă HTTPS fixă permanentă (Tailscale Funnel) — nu mai expiră niciodată',
+      '⚙️ Serviciu automat în fundal pe Mac mini (funcționează chiar și cu proiectul închis)',
       '🚀 Sistem inteligent de actualizare în aplicație (Actualizează acum / Mai târziu)',
       '🎨 Design Neo-Skeuomorphism (White & Dark) + Safe Area pentru iPhone Notch'
     ]
@@ -302,7 +302,7 @@
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker
-      .register('./sw.js?v=12')
+      .register('./sw.js?v=13')
       .then((reg) => {
         swRegistration = reg;
         reg.addEventListener('updatefound', () => {
