@@ -239,6 +239,141 @@ function sanitizeFileName(raw) {
   return (cleaned || 'melodie').slice(0, 100);
 }
 
+function getCookiesFilePath() {
+  const rawCookies = process.env.YOUTUBE_COOKIES || '';
+  const b64Cookies = process.env.YOUTUBE_COOKIES_BASE64 || '';
+  let content = rawCookies;
+  if (!content && b64Cookies) {
+    try {
+      content = Buffer.from(b64Cookies, 'base64').toString('utf8');
+    } catch (_) {}
+  }
+  if (!content.trim()) return null;
+  const cookiePath = path.join(TMP_BASE_DIR, 'youtube_cookies.txt');
+  fs.writeFileSync(cookiePath, content, 'utf8');
+  return cookiePath;
+}
+
+const PIPED_STREAM_APIS = [
+  'https://api.piped.private.coffee',
+  'https://pipedapi.ducks.party',
+  'https://pipedapi.kavin.rocks'
+];
+
+function runYtDlpProcess(ytdlpBin, args, job) {
+  return new Promise((resolve, reject) => {
+    const proc = spawn(ytdlpBin, args, {
+      env: {
+        ...process.env,
+        PATH: `${FFMPEG_DIR ? FFMPEG_DIR + ':' : ''}/opt/homebrew/bin:/usr/local/bin:${process.env.PATH || ''}`
+      }
+    });
+
+    let stderrBuf = '';
+
+    const handleLine = (line) => {
+      const trimmed = line.trim();
+      if (!trimmed) return;
+      const pctMatch = trimmed.match(/\[download\]\s+(\d+(?:\.\d+)?)%/);
+      if (pctMatch) {
+        const dlPct = parseFloat(pctMatch[1]);
+        job.progress = Math.min(82, Math.max(8, Math.round(dlPct * 0.8)));
+        job.statusText = `Descărcare flux audio: ${Math.round(dlPct)}%`;
+      } else if (/\[ExtractAudio\]/i.test(trimmed)) {
+        job.progress = 90;
+        job.statusText = 'Conversie în format MP3 (FFmpeg)...';
+      } else if (/\[Metadata\]/i.test(trimmed)) {
+        job.progress = 96;
+        job.statusText = 'Se adaugă metadatele ID3 în MP3...';
+      }
+    };
+
+    proc.stdout.on('data', (chunk) => {
+      String(chunk).split(/\r?\n/).forEach(handleLine);
+    });
+
+    proc.stderr.on('data', (chunk) => {
+      const text = String(chunk);
+      stderrBuf += text;
+      text.split(/\r?\n/).forEach(handleLine);
+    });
+
+    proc.on('error', reject);
+    proc.on('close', (code) => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(stderrBuf.trim().split('\n').pop() || `yt-dlp exit code ${code}`));
+      }
+    });
+  });
+}
+
+async function extractViaPipedAndFfmpeg(videoId, title, jobDir, qArg, job) {
+  const ffmpegBin = FFMPEG_DIR ? path.join(FFMPEG_DIR, 'ffmpeg') : 'ffmpeg';
+  const bitrateMap = { '0': '256k', '192K': '192k', '128K': '128k' };
+  const bitrate = bitrateMap[qArg] || '192k';
+
+  for (const apiBase of PIPED_STREAM_APIS) {
+    try {
+      job.progress = 15;
+      job.statusText = 'Se preia fluxul audio (server alternativ)...';
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 12000);
+      const res = await fetch(`${apiBase}/streams/${encodeURIComponent(videoId)}`, {
+        signal: controller.signal,
+        headers: { 'User-Agent': 'YT2MP3-PWA/1.0' }
+      });
+      clearTimeout(timer);
+      if (!res.ok) continue;
+
+      const data = await res.json();
+      const audioStreams = Array.isArray(data.audioStreams) ? data.audioStreams : [];
+      if (audioStreams.length === 0) continue;
+
+      audioStreams.sort((a, b) => (Number(b.bitrate) || 0) - (Number(a.bitrate) || 0));
+      const best = audioStreams.find((s) => s.url) || audioStreams[0];
+      if (!best || !best.url) continue;
+
+      const outName = sanitizeFileName(data.title || title) + '.mp3';
+      const outPath = path.join(jobDir, outName);
+
+      job.progress = 45;
+      job.statusText = 'Descărcare și conversie în MP3 (FFmpeg)...';
+
+      await new Promise((resolve, reject) => {
+        const ffArgs = [
+          '-y',
+          '-i', best.url,
+          '-vn',
+          '-c:a', 'libmp3lame',
+          '-b:a', bitrate,
+          '-metadata', `title=${data.title || title}`,
+          '-metadata', `artist=${data.uploader || 'YouTube'}`,
+          outPath
+        ];
+        const proc = spawn(ffmpegBin, ffArgs);
+        let errBuf = '';
+        proc.stderr.on('data', (chunk) => {
+          errBuf += String(chunk);
+        });
+        proc.on('error', reject);
+        proc.on('close', (code) => {
+          if (code === 0 && fs.existsSync(outPath) && fs.statSync(outPath).size > 1000) {
+            resolve();
+          } else {
+            reject(new Error(errBuf.trim().split('\n').pop() || `ffmpeg exit ${code}`));
+          }
+        });
+      });
+
+      return outName;
+    } catch (_) {}
+  }
+
+  throw new Error('Nu s-a putut extrage fluxul audio prin serverele alternative.');
+}
+
 async function startMp3Job({ url, quality = '0', title = 'Melodie YouTube' }) {
   const videoId = extractVideoId(url);
   if (!videoId) {
@@ -267,69 +402,57 @@ async function startMp3Job({ url, quality = '0', title = 'Melodie YouTube' }) {
       const ytdlpBin = await ensureYtDlpBinary();
       const validQualities = new Set(['0', '192K', '128K']);
       const qArg = validQualities.has(quality) ? quality : '0';
+      const cookiesPath = getCookiesFilePath();
 
-      const args = [
-        '-x',
-        '--audio-format', 'mp3',
-        '--audio-quality', qArg,
-        '--add-metadata',
-        '--no-playlist',
-        '--newline',
-        '-o', path.join(jobDir, '%(title).100s.%(ext)s')
-      ];
+      const buildArgs = (playerClient) => {
+        const a = [
+          '-x',
+          '--audio-format', 'mp3',
+          '--audio-quality', qArg,
+          '--add-metadata',
+          '--no-playlist',
+          '--newline',
+          '-o', path.join(jobDir, '%(title).100s.%(ext)s')
+        ];
+        if (playerClient) {
+          a.push('--extractor-args', `youtube:player_client=${playerClient}`);
+        }
+        if (cookiesPath) {
+          a.push('--cookies', cookiesPath);
+        }
+        if (FFMPEG_DIR) {
+          a.push('--ffmpeg-location', FFMPEG_DIR);
+        }
+        a.push(canonicalUrl);
+        return a;
+      };
 
-      if (FFMPEG_DIR) {
-        args.push('--ffmpeg-location', FFMPEG_DIR);
+      const clientStrategies = ['android_vr', 'tv', 'ios', null];
+      let extractedOk = false;
+      let lastErr = null;
+
+      for (const clientStrategy of clientStrategies) {
+        try {
+          await runYtDlpProcess(ytdlpBin, buildArgs(clientStrategy), job);
+          extractedOk = true;
+          break;
+        } catch (err) {
+          lastErr = err;
+          if (clientStrategy !== null) {
+            job.progress = 10;
+            job.statusText = 'Se încearcă metodă alternativă de extragere...';
+          }
+        }
       }
 
-      args.push(canonicalUrl);
-
-      await new Promise((resolve, reject) => {
-        const proc = spawn(ytdlpBin, args, {
-          env: {
-            ...process.env,
-            PATH: `${FFMPEG_DIR ? FFMPEG_DIR + ':' : ''}/opt/homebrew/bin:/usr/local/bin:${process.env.PATH || ''}`
-          }
-        });
-
-        let stderrBuf = '';
-
-        const handleLine = (line) => {
-          const trimmed = line.trim();
-          if (!trimmed) return;
-          const pctMatch = trimmed.match(/\[download\]\s+(\d+(?:\.\d+)?)%/);
-          if (pctMatch) {
-            const dlPct = parseFloat(pctMatch[1]);
-            job.progress = Math.min(82, Math.max(8, Math.round(dlPct * 0.8)));
-            job.statusText = `Descărcare flux audio: ${Math.round(dlPct)}%`;
-          } else if (/\[ExtractAudio\]/i.test(trimmed)) {
-            job.progress = 90;
-            job.statusText = 'Conversie în format MP3 (FFmpeg)...';
-          } else if (/\[Metadata\]/i.test(trimmed)) {
-            job.progress = 96;
-            job.statusText = 'Se adaugă metadatele ID3 în MP3...';
-          }
-        };
-
-        proc.stdout.on('data', (chunk) => {
-          String(chunk).split(/\r?\n/).forEach(handleLine);
-        });
-
-        proc.stderr.on('data', (chunk) => {
-          const text = String(chunk);
-          stderrBuf += text;
-          text.split(/\r?\n/).forEach(handleLine);
-        });
-
-        proc.on('error', reject);
-        proc.on('close', (code) => {
-          if (code === 0) {
-            resolve();
-          } else {
-            reject(new Error(stderrBuf.trim().split('\n').pop() || `yt-dlp exit code ${code}`));
-          }
-        });
-      });
+      if (!extractedOk) {
+        try {
+          await extractViaPipedAndFfmpeg(videoId, title, jobDir, qArg, job);
+          extractedOk = true;
+        } catch (_) {
+          throw lastErr || new Error('Extragerea MP3 a eșuat.');
+        }
+      }
 
       const files = fs.readdirSync(jobDir);
       const mp3File = files.find((f) => f.toLowerCase().endsWith('.mp3')) || files[0];

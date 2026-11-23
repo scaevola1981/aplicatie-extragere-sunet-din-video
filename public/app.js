@@ -90,8 +90,8 @@
     });
   }
 
-  // Backend API URL (Cloudflare HTTPS Tunnel + Localhost fallback sau ?api=https://...)
-  const DEFAULT_TUNNEL_API = 'https://locks-uniform-residents-influenced.trycloudflare.com';
+  // Backend API URL (Server Cloud 24/7 Render.com + Localhost fallback sau ?api=https://...)
+  const DEFAULT_TUNNEL_API = 'https://aplicatie-extragere-sunet-din-video.onrender.com';
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.has('api')) {
     const customApi = urlParams.get('api').replace(/\/+$/, '');
@@ -157,17 +157,17 @@
     searchForm.addEventListener('change', syncFallbackClasses);
   }
 
-  const CURRENT_APP_VERSION = 'v11';
+  const CURRENT_APP_VERSION = 'v12';
   let latestVersionInfo = {
     version: CURRENT_APP_VERSION,
-    date: '12 Noiembrie 2026',
-    title: 'Actualizare Nouă — YT2MP3 v11',
-    subtitle: '12 Noiembrie 2026 • Tunel activ Cloudflare & suport Tailscale',
+    date: '23 Noiembrie 2026',
+    title: 'Actualizare Nouă — YT2MP3 v12 (Cloud 24/7)',
+    subtitle: '23 Noiembrie 2026 • Server Cloud Render.com — 100% independent de Mac',
     notes: [
-      '⚡ Tunel HTTPS Cloudflare nou activat pentru descărcări rapide pe mobil',
+      '☁️ Server Cloud permanent pe Render.com (funcționează 24/7 fără Mac pornit)',
+      '⚡ Extragere MP3 multi-strategie (yt-dlp + fallback automat Piped & FFmpeg)',
       '🚀 Sistem inteligent de actualizare în aplicație (Actualizează acum / Mai târziu)',
-      '🎨 Design Neo-Skeuomorphism cu comutator instant ☀️ White / 🌙 Dark',
-      '📱 Protecție Safe Area în partea superioară pentru iPhone Notch & Dynamic Island'
+      '🎨 Design Neo-Skeuomorphism (White & Dark) + Safe Area pentru iPhone Notch'
     ]
   };
   let swRegistration = null;
@@ -302,7 +302,7 @@
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker
-      .register('./sw.js?v=11')
+      .register('./sw.js?v=12')
       .then((reg) => {
         swRegistration = reg;
         reg.addEventListener('updatefound', () => {

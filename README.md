@@ -2,7 +2,8 @@
 
 Aplicație **Progressive Web App (PWA)** pentru căutarea videoclipurilor pe YouTube și extragerea rapidă a sunetului în format **MP3** (`256 kbps`, `192 kbps`, `128 kbps`), cu bibliotecă audio **100% Offline** (`IndexedDB`) și interfață **Neo-Skeuomorphism** (temă **White Porcelain** & **Dark Obsidian Graphite**).
 
-- 🌐 **URL Live (GitHub Pages):** [https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=11](https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=11)
+- 🌐 **URL Live (GitHub Pages):** [https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=12](https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=12)
+- ☁️ **URL Direct Cloud (Render.com 24/7):** [https://aplicatie-extragere-sunet-din-video.onrender.com](https://aplicatie-extragere-sunet-din-video.onrender.com)
 - 📦 **Repository GitHub:** [https://github.com/scaevola1981/aplicatie-extragere-sunet-din-video](https://github.com/scaevola1981/aplicatie-extragere-sunet-din-video)
 - 📋 **Reguli & Jurnal Sesiuni Agent:** [`regului.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/regului.md) & [`AGENTS.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/AGENTS.md)
 
@@ -78,6 +79,9 @@ Fișierele din [`public/`](file:///Users/florindorobantu/Desktop/Aplicatie-trans
 
 ## 📝 Istoric Versiuni (Changelog)
 
+- **`v12` (23 Noiembrie 2026):**
+  - Migrare completă la backend Cloud 24/7 pe **Render.com** (`https://aplicatie-extragere-sunet-din-video.onrender.com`) — aplicația nu mai depinde de Mac-ul local sau de tunelurile temporare Cloudflare.
+  - Îmbunătățit [`server.js`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/server.js) cu strategii multiple `yt-dlp` (`android_vr`, `tv`, `ios`), suport opțional pentru `YOUTUBE_COOKIES` / `YOUTUBE_COOKIES_BASE64` și fallback automat prin Piped API + `FFmpeg` pentru IP-urile de cloud.
 - **`v11` (12 Noiembrie 2026):**
   - Repornit tunelul HTTPS Cloudflare activ (`https://locks-uniform-residents-influenced.trycloudflare.com`) pentru restabilirea descărcărilor pe telefonul altor utilizatori.
   - Creat scriptul de pornire automată [`start-server.sh`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/start-server.sh) pentru control rapid local sau prin SSH/Comenzi Rapide de pe iPhone prin Tailscale (`100.97.95.82`).

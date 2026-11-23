@@ -1,12 +1,12 @@
 {
-  "version": "v11",
-  "date": "12 Noiembrie 2026",
-  "title": "Actualizare Nouă — YT2MP3 v11",
-  "subtitle": "12 Noiembrie 2026 • Tunel activ Cloudflare & suport Tailscale",
+  "version": "v12",
+  "date": "23 Noiembrie 2026",
+  "title": "Actualizare Nouă — YT2MP3 v12 (Cloud 24/7)",
+  "subtitle": "23 Noiembrie 2026 • Server Cloud Render.com — 100% independent de Mac",
   "notes": [
-    "⚡ Tunel HTTPS Cloudflare nou activat pentru descărcări rapide pe mobil",
+    "☁️ Server Cloud permanent pe Render.com (funcționează 24/7 fără Mac pornit)",
+    "⚡ Extragere MP3 multi-strategie (yt-dlp + fallback automat Piped & FFmpeg)",
     "🚀 Sistem inteligent de actualizare în aplicație (Actualizează acum / Mai târziu)",
-    "🎨 Design Neo-Skeuomorphism cu comutator instant ☀️ White / 🌙 Dark",
-    "📱 Protecție Safe Area în partea superioară pentru iPhone Notch & Dynamic Island"
+    "🎨 Design Neo-Skeuomorphism (White & Dark) + Safe Area pentru iPhone Notch"
   ]
 }
