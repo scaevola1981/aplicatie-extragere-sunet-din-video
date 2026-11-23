@@ -885,6 +885,16 @@
     line-height: 1.4;
   }
 
+  .update-progress-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 14px;
+    border-radius: var(--radius-inner);
+    background: var(--neo-bg);
+    box-shadow: var(--neo-inset-sm);
+  }
+
   .update-status-msg {
     margin: 0;
     font-size: 0.82rem;
@@ -897,6 +907,11 @@
     display: grid;
     grid-template-columns: 1fr 1.25fr;
     gap: 12px;
+    margin-block-start: 2px;
+  }
+
+  .update-dialog-actions-single {
+    display: flex;
     margin-block-start: 2px;
   }
 

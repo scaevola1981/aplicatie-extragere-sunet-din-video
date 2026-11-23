@@ -1,12 +1,12 @@
 {
-  "version": "v15",
+  "version": "v16",
   "date": "23 Noiembrie 2026",
-  "title": "Actualizare Nouă — YT2MP3 v15 (Descărcare Instantă iOS)",
-  "subtitle": "23 Noiembrie 2026 • Eliminat complet blocajul la descărcare pe iPhone",
+  "title": "Actualizare Nouă — YT2MP3 v16",
+  "subtitle": "23 Noiembrie 2026 • Bară de progres la actualizare & stare „La zi”",
   "notes": [
-    "⚡ Afișare instantă a butonului „Descarcă MP3” imediat ce conversia ajunge la 100%",
-    "🎧 Previzualizare audio direct în card + descărcare nativă Safari (fără blocare)",
-    "📂 Salvare offline în bibliotecă în fundal (nu mai blochează ecranul)",
+    "📊 Bară de progres live la apăsarea butonului „Actualizează acum”",
+    "✅ După actualizare, modalul nu mai apare automat și afișează „Nu există actualizări momentan”",
+    "⚡ Descărcare MP3 instantă pe iPhone + player audio integrat",
     "🔒 Conexiune HTTPS permanentă 24/7 prin Tailscale Funnel"
   ]
 }

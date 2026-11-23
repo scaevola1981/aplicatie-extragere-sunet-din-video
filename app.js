@@ -18,7 +18,12 @@
   const updateDialogTitle = document.getElementById('updateDialogTitle');
   const updateDialogSubtitle = document.getElementById('updateDialogSubtitle');
   const updateNotesList = document.getElementById('updateNotesList');
+  const updateProgressWrap = document.getElementById('updateProgressWrap');
+  const updateProgressBar = document.getElementById('updateProgressBar');
   const updateStatusMsg = document.getElementById('updateStatusMsg');
+  const updateActionsHasUpdate = document.getElementById('updateActionsHasUpdate');
+  const updateActionsUpToDate = document.getElementById('updateActionsUpToDate');
+  const updateNowBtn = document.getElementById('updateNowBtn');
   const importMp3Btn = document.getElementById('importMp3Btn');
   const importMp3Input = document.getElementById('importMp3Input');
   const colorSchemeMeta = document.querySelector('meta[name="color-scheme"]');
@@ -157,20 +162,21 @@
     searchForm.addEventListener('change', syncFallbackClasses);
   }
 
-  const CURRENT_APP_VERSION = 'v15';
+  const CURRENT_APP_VERSION = 'v16';
   let latestVersionInfo = {
     version: CURRENT_APP_VERSION,
     date: '23 Noiembrie 2026',
-    title: 'Actualizare Nouă — YT2MP3 v15 (Descărcare Instantă iOS)',
-    subtitle: '23 Noiembrie 2026 • Eliminat complet blocajul la descărcare pe iPhone',
+    title: 'Actualizare Nouă — YT2MP3 v16',
+    subtitle: '23 Noiembrie 2026 • Bară de progres la actualizare & stare „La zi”',
     notes: [
-      '⚡ Afișare instantă a butonului „Descarcă MP3” imediat ce conversia ajunge la 100%',
-      '🎧 Previzualizare audio direct în card + descărcare nativă Safari (fără blocare)',
-      '📂 Salvare offline în bibliotecă în fundal (nu mai blochează ecranul)',
+      '📊 Bară de progres live la apăsarea butonului „Actualizează acum”',
+      '✅ După actualizare, modalul nu mai apare automat și afișează „Nu există actualizări momentan”',
+      '⚡ Descărcare MP3 instantă pe iPhone + player audio integrat',
       '🔒 Conexiune HTTPS permanentă 24/7 prin Tailscale Funnel'
     ]
   };
   let swRegistration = null;
+  let isApplyingUpdate = false;
 
   // Fallback for <dialog closedby="any"> in browsers without native closedBy support
   if (!('closedBy' in HTMLDialogElement.prototype)) {
@@ -184,44 +190,84 @@
         pressedOutside = outside(e, dialog);
       });
       dialog.addEventListener('pointerup', (e) => {
-        if (pressedOutside && outside(e, dialog)) dialog.close();
+        if (pressedOutside && outside(e, dialog) && !isApplyingUpdate) dialog.close();
       });
     }
   }
 
+  function hasPendingUpdate(info) {
+    const remoteVer = (info && info.version) || CURRENT_APP_VERSION;
+    return remoteVer !== CURRENT_APP_VERSION;
+  }
+
   function renderUpdateDialogContent(info) {
     if (!updateDialog) return;
-    const ver = info.version || CURRENT_APP_VERSION;
-    if (updateVersionBadge) updateVersionBadge.textContent = `Versiunea ${ver}`;
-    if (updateDialogTitle) updateDialogTitle.textContent = info.title || `Actualizare Nouă — YT2MP3 ${ver}`;
-    if (updateDialogSubtitle) {
-      updateDialogSubtitle.textContent =
-        info.subtitle || `${info.date || ''} • Cele mai noi îmbunătățiri sunt gata de instalare`;
+    const remoteVer = (info && info.version) || CURRENT_APP_VERSION;
+    const updateAvailable = hasPendingUpdate(info);
+
+    if (updateProgressWrap && !isApplyingUpdate) {
+      updateProgressWrap.classList.add('hidden');
     }
-    if (updateNotesList && Array.isArray(info.notes) && info.notes.length > 0) {
-      updateNotesList.innerHTML = '';
-      for (const note of info.notes) {
-        const li = document.createElement('li');
-        li.textContent = note;
-        updateNotesList.appendChild(li);
+
+    if (updateAvailable) {
+      if (updateVersionBadge) updateVersionBadge.textContent = `Versiunea ${remoteVer}`;
+      if (updateDialogTitle) updateDialogTitle.textContent = info.title || `Actualizare Nouă — YT2MP3 ${remoteVer}`;
+      if (updateDialogSubtitle) {
+        updateDialogSubtitle.textContent =
+          info.subtitle || `${info.date || ''} • Cele mai noi îmbunătățiri sunt gata de instalare`;
       }
+      if (updateNotesList) {
+        updateNotesList.innerHTML = '';
+        const notes = Array.isArray(info.notes) ? info.notes : [];
+        for (const note of notes) {
+          const li = document.createElement('li');
+          li.textContent = note;
+          updateNotesList.appendChild(li);
+        }
+        updateNotesList.classList.toggle('hidden', notes.length === 0);
+      }
+      if (updateActionsHasUpdate) updateActionsHasUpdate.classList.remove('hidden');
+      if (updateActionsUpToDate) updateActionsUpToDate.classList.add('hidden');
+    } else {
+      if (updateVersionBadge) updateVersionBadge.textContent = `✅ Versiunea ${CURRENT_APP_VERSION}`;
+      if (updateDialogTitle) updateDialogTitle.textContent = 'Nu există actualizări momentan';
+      if (updateDialogSubtitle) {
+        updateDialogSubtitle.textContent = `Folosești deja cea mai recentă versiune a aplicației YT2MP3 (${CURRENT_APP_VERSION}).`;
+      }
+      if (updateNotesList) updateNotesList.classList.add('hidden');
+      if (updateActionsHasUpdate) updateActionsHasUpdate.classList.add('hidden');
+      if (updateActionsUpToDate) updateActionsUpToDate.classList.remove('hidden');
     }
-    const ackVer = localStorage.getItem('yt2mp3_ack_version');
+
     if (openUpdateModalBtn) {
-      const hasUnapplied = ackVer !== ver;
-      openUpdateModalBtn.textContent = hasUnapplied ? `🔄 ${ver} • Nou` : `🔄 ${ver}`;
-      openUpdateModalBtn.classList.toggle('has-update', hasUnapplied);
+      openUpdateModalBtn.textContent = updateAvailable ? `🔄 ${remoteVer} • Nou` : `🔄 ${CURRENT_APP_VERSION}`;
+      openUpdateModalBtn.classList.toggle('has-update', updateAvailable);
     }
   }
 
+  function setUpdateProgress(percent, text) {
+    if (updateProgressWrap) updateProgressWrap.classList.remove('hidden');
+    if (updateProgressBar) updateProgressBar.value = percent;
+    if (updateStatusMsg) updateStatusMsg.textContent = `${text} (${percent}%)`;
+  }
+
   async function applyAppUpdateNow() {
+    if (isApplyingUpdate) return;
+    isApplyingUpdate = true;
+
     const targetVer = latestVersionInfo.version || CURRENT_APP_VERSION;
+    if (updateActionsHasUpdate) updateActionsHasUpdate.classList.add('hidden');
+    if (updateActionsUpToDate) updateActionsUpToDate.classList.add('hidden');
+
+    setUpdateProgress(15, '⏳ Se pregătește actualizarea...');
+
     try {
       localStorage.setItem('yt2mp3_ack_version', targetVer);
       sessionStorage.removeItem('yt2mp3_dismissed_version');
     } catch (_) {}
 
-    showLoadingCard(`Se actualizează aplicația la ${targetVer}...`);
+    await new Promise((r) => setTimeout(r, 250));
+    setUpdateProgress(45, '🧹 Se curăță fișierele vechi din cache...');
 
     try {
       if ('serviceWorker' in navigator) {
@@ -241,8 +287,14 @@
       }
     } catch (_) {}
 
+    await new Promise((r) => setTimeout(r, 300));
+    setUpdateProgress(80, `📦 Se instalează versiunea ${targetVer}...`);
+    await new Promise((r) => setTimeout(r, 350));
+    setUpdateProgress(100, '✅ Actualizare finalizată! Se reîncarcă...');
+    await new Promise((r) => setTimeout(r, 350));
+
     const nextUrl = new URL(window.location.href);
-    const verNum = String(targetVer).replace(/^v/i, '') || '14';
+    const verNum = String(targetVer).replace(/^v/i, '') || '16';
     nextUrl.searchParams.set('v', verNum);
     nextUrl.searchParams.set('r', String(Date.now()));
     window.location.href = nextUrl.toString();
@@ -259,20 +311,25 @@
       }
     } catch (_) {}
 
+    const updateAvailable = hasPendingUpdate(latestVersionInfo);
+    if (!updateAvailable) {
+      try {
+        localStorage.setItem('yt2mp3_ack_version', CURRENT_APP_VERSION);
+        sessionStorage.removeItem('yt2mp3_dismissed_version');
+      } catch (_) {}
+    }
+
     renderUpdateDialogContent(latestVersionInfo);
     if (!updateDialog) return;
 
     const targetVer = latestVersionInfo.version || CURRENT_APP_VERSION;
-    let ackVer = null;
     let dismissedVer = null;
     try {
-      ackVer = localStorage.getItem('yt2mp3_ack_version');
       dismissedVer = sessionStorage.getItem('yt2mp3_dismissed_version');
     } catch (_) {}
 
-    const shouldPrompt = forceOpen || (ackVer !== targetVer && dismissedVer !== targetVer);
+    const shouldPrompt = forceOpen || (updateAvailable && dismissedVer !== targetVer);
     if (shouldPrompt && !updateDialog.open) {
-      if (updateStatusMsg) updateStatusMsg.classList.add('hidden');
       updateDialog.showModal();
     }
   }
@@ -282,25 +339,33 @@
       checkForAppUpdates(true);
     });
 
+    if (updateNowBtn) {
+      updateNowBtn.addEventListener('click', () => {
+        applyAppUpdateNow();
+      });
+    }
+
+    updateDialog.addEventListener('cancel', (e) => {
+      if (isApplyingUpdate) {
+        e.preventDefault();
+      }
+    });
+
     updateDialog.addEventListener('close', () => {
       const choice = updateDialog.returnValue;
       updateDialog.returnValue = '';
-      const targetVer = latestVersionInfo.version || CURRENT_APP_VERSION;
-
-      if (choice === 'update-now') {
-        applyAppUpdateNow();
-      } else {
+      if (choice === 'later' && hasPendingUpdate(latestVersionInfo)) {
         try {
-          sessionStorage.setItem('yt2mp3_dismissed_version', targetVer);
+          sessionStorage.setItem('yt2mp3_dismissed_version', latestVersionInfo.version);
         } catch (_) {}
-        renderUpdateDialogContent(latestVersionInfo);
       }
+      renderUpdateDialogContent(latestVersionInfo);
     });
   }
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker
-      .register('./sw.js?v=15')
+      .register('./sw.js?v=16')
       .then((reg) => {
         swRegistration = reg;
         reg.addEventListener('updatefound', () => {

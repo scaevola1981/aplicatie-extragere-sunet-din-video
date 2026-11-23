@@ -20,10 +20,10 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="YT2MP3">
   <title>YT2MP3 — Descarcă Muzică MP3 din YouTube</title>
-  <link rel="manifest" href="./manifest.json?v=15">
+  <link rel="manifest" href="./manifest.json?v=16">
   <link rel="icon" type="image/svg+xml" href="./icon.svg">
   <link rel="apple-touch-icon" href="./icon.svg">
-  <link rel="stylesheet" href="./styles.css?v=15">
+  <link rel="stylesheet" href="./styles.css?v=16">
 </head>
 <body>
   <main class="app-container">
@@ -37,7 +37,7 @@
       </div>
       <div class="header-actions">
         <button type="button" id="openUpdateModalBtn" class="btn-icon" aria-label="Vezi noile actualizări">
-          🔄 v15
+          🔄 v16
         </button>
         <button type="button" id="themeToggleBtn" class="btn-icon" aria-label="Comută tema White / Dark">
           🌓 Temă
@@ -121,28 +121,31 @@
     <!-- Modal Actualizari Noi (Native HTML <dialog>) -->
     <dialog id="updateDialog" closedby="any" aria-labelledby="updateDialogTitle" class="update-dialog">
       <div class="update-dialog-header">
-        <span id="updateVersionBadge" class="update-badge">Versiunea v10</span>
-        <h2 id="updateDialogTitle" class="update-dialog-title">Actualizare Nouă — YT2MP3 v10</h2>
-        <p id="updateDialogSubtitle" class="update-dialog-subtitle">12 Noiembrie 2026 • Cele mai noi îmbunătățiri sunt gata de instalare</p>
+        <span id="updateVersionBadge" class="update-badge">Versiunea v16</span>
+        <h2 id="updateDialogTitle" class="update-dialog-title">Nu există actualizări momentan</h2>
+        <p id="updateDialogSubtitle" class="update-dialog-subtitle">Folosești deja cea mai recentă versiune a aplicației YT2MP3.</p>
       </div>
-      <ul id="updateNotesList" class="update-notes-list">
-        <li>🚀 Sistem inteligent de actualizare în aplicație (Actualizează acum / Mai târziu)</li>
-        <li>🎨 Design Neo-Skeuomorphism cu comutator instant ☀️ White / 🌙 Dark</li>
-        <li>📱 Protecție Safe Area în partea superioară pentru iPhone Notch &amp; Dynamic Island</li>
-        <li>⚡ Extragere MP3 rapidă prin tunel HTTPS Cloudflare + fallback automat Localhost</li>
-      </ul>
-      <p id="updateStatusMsg" class="update-status-msg hidden" aria-live="polite"></p>
-      <form method="dialog" class="update-dialog-actions">
+      <ul id="updateNotesList" class="update-notes-list hidden"></ul>
+      <div id="updateProgressWrap" class="update-progress-wrap hidden">
+        <progress id="updateProgressBar" max="100" value="0"></progress>
+        <p id="updateStatusMsg" class="update-status-msg" aria-live="polite"></p>
+      </div>
+      <form method="dialog" id="updateActionsHasUpdate" class="update-dialog-actions hidden">
         <button type="submit" value="later" id="updateLaterBtn" class="btn btn-secondary">
           ⏳ Mai târziu
         </button>
-        <button type="submit" value="update-now" id="updateNowBtn" class="btn btn-primary" autofocus>
+        <button type="button" id="updateNowBtn" class="btn btn-primary" autofocus>
           🚀 Actualizează acum
+        </button>
+      </form>
+      <form method="dialog" id="updateActionsUpToDate" class="update-dialog-actions-single">
+        <button type="submit" value="close" id="updateCloseBtn" class="btn btn-primary btn-full" autofocus>
+          👍 Închide
         </button>
       </form>
     </dialog>
   </main>
 
-  <script src="./app.js?v=15"></script>
+  <script src="./app.js?v=16"></script>
 </body>
 </html>

@@ -9,7 +9,7 @@ Acest fișier trebuie **citit la începutul fiecărei sesiuni** și **actualizat
 De fiecare dată când utilizatorul îți trimite o cerere nouă în acest proiect:
 
 1. **Citește [`regului.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/regului.md) și [`README.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/README.md)** pentru a ști exact:
-   - Care este **versiunea curentă de cache PWA** (în prezent: **`v15`**).
+   - Care este **versiunea curentă de cache PWA** (în prezent: **`v16`**).
    - Care este **URL-ul permanent de backend (Tailscale Funnel)** configurat în `DEFAULT_TUNNEL_API` din [`public/app.js`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/public/app.js) (`https://mac-mini-florin.tail1bff6a.ts.net`).
    - Ce s-a lucrat la ultima intervenție.
 2. **Verifică procesele de fundal (`manage_task` cu `Action: "list"`):**
@@ -52,17 +52,16 @@ Ori de câte ori modifici codul aplicației (HTML, CSS, JS sau backend):
 ## 📊 3. Starea Tehnică la Zi & Ultima Intervenție
 
 - **Data ultimei actualizări:** `23 Noiembrie 2026`
-- **Versiunea PWA curentă:** `v15`
-- **URL Live GitHub Pages:** `https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=15`
+- **Versiunea PWA curentă:** `v16`
+- **URL Live GitHub Pages:** `https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=16`
 - **URL Permanent Tailscale Funnel (Mac mini 24/7):** `https://mac-mini-florin.tail1bff6a.ts.net` (`proxy http://127.0.0.1:3080`, activ permanent în fundal).
 - **Serviciu macOS (`launchd`):** `com.florin.yt2mp3.server` (instalare/actualizare prin `./install-mac-service.sh`, rulează din `~/.yt2mp3-service` chiar și cu proiectul și Antigravity închise).
 
-### Ce am făcut ultima oară (23 Noiembrie 2026 — `v15`):
-1. **Eliminare definitivă a blocajului la descărcare pe iOS Safari:**
-   - Am eliminat `await fetch(directFileUrl).blob()` blocant la finalizarea conversiei (care agăța WebKit pe iOS la fișiere `Content-Disposition: attachment`).
-   - Acum, în momentul în care `job.status === 'completed'`, aplicația afișează **instantaneu** `<audio controls>` (`?inline=1`), butonul nativ `<a download>` (**⬇️ Descarcă MP3 pe Telefon**) și butonul **📂 Salvează în Fișiere / WhatsApp**, iar salvarea în `IndexedDB` rulează non-blocant în fundal cu `AbortController` timeout 20s.
-2. **Suport `?inline=1` în [`server.js`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/server.js):**
-   - Permite redarea audio și `fetch().blob()` fără header-ul `Content-Disposition: attachment`.
-3. **Sincronizare `v15`:**
+### Ce am făcut ultima oară (23 Noiembrie 2026 — `v16`):
+1. **Bară de progres la actualizare în `<dialog id="updateDialog">`:**
+   - La apăsarea **🚀 Actualizează acum**, modalul rămâne deschis și afișează o bară `<progress>` cu pașii live (`15% -> 45% -> 80% -> 100%`) în timp ce golește cache-ul și reîncarcă versiunea nouă.
+2. **Stare „Nu există actualizări momentan”:**
+   - Odată ce aplicația rulează pe versiunea curentă (`CURRENT_APP_VERSION === remoteVersion`), modalul nu mai apare automat; la deschiderea manuală din antet (`🔄 v16`), afișează **„Nu există actualizări momentan”** și un singur buton **👍 Închide**.
+3. **Sincronizare `v16`:**
    - Copiat `public/` în rădăcină, actualizat `~/.yt2mp3-service` prin `./install-mac-service.sh` și publicat pe `origin main`.
 
