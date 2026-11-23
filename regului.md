@@ -9,7 +9,7 @@ Acest fișier trebuie **citit la începutul fiecărei sesiuni** și **actualizat
 De fiecare dată când utilizatorul îți trimite o cerere nouă în acest proiect:
 
 1. **Citește [`regului.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/regului.md) și [`README.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/README.md)** pentru a ști exact:
-   - Care este **versiunea curentă de cache PWA** (în prezent: **`v17`**).
+   - Care este **versiunea curentă de cache PWA** (în prezent: **`v18`**).
    - Care este **URL-ul permanent de backend (Tailscale Funnel)** configurat în `DEFAULT_TUNNEL_API` din [`public/app.js`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/public/app.js) (`https://mac-mini-florin.tail1bff6a.ts.net`).
    - Ce s-a lucrat la ultima intervenție.
 2. **Verifică procesele de fundal (`manage_task` cu `Action: "list"`):**
@@ -52,17 +52,15 @@ Ori de câte ori modifici codul aplicației (HTML, CSS, JS sau backend):
 ## 📊 3. Starea Tehnică la Zi & Ultima Intervenție
 
 - **Data ultimei actualizări:** `23 Noiembrie 2026`
-- **Versiunea PWA curentă:** `v17`
-- **URL Live GitHub Pages:** `https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=17`
+- **Versiunea PWA curentă:** `v18`
+- **URL Live GitHub Pages:** `https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=18`
 - **URL Permanent Tailscale Funnel (Mac mini 24/7):** `https://mac-mini-florin.tail1bff6a.ts.net` (`proxy http://127.0.0.1:3080`, activ permanent în fundal).
 - **Serviciu macOS (`launchd`):** `com.florin.yt2mp3.server` (instalare/actualizare prin `./install-mac-service.sh`, rulează din `~/.yt2mp3-service` chiar și cu proiectul și Antigravity închise).
 
-### Ce am făcut ultima oară (23 Noiembrie 2026 — `v17`):
-1. **Fix `Sesiunea de descărcare nu a fost găsită` & `<audio> Eroare` pe iOS (`server.js`):**
-   - Adăugat fallback pe disc (`TMP_BASE_DIR/<jobId>/*.mp3`) astfel încât fișierele MP3 rămân descărcabile chiar și după o repornire a serverului.
-   - Adăugat suport `HTTP Range` (`206 Partial Content` + `Accept-Ranges: bytes`) obligatoriu pentru redarea audio pe iOS Safari.
-2. **Fix aliniere buton roșu `<a class="btn btn-primary btn-full">` (`styles.css`):**
-   - Adăugat `a` în `box-sizing: border-box` ca să nu mai iasă din card în dreapta.
-3. **Sincronizare `v17`:**
+### Ce am făcut ultima oară (23 Noiembrie 2026 — `v18`):
+1. **Fix arhivă offline `IndexedDB` pe iPhone / iOS Safari (`public/app.js`):**
+   - `saveMp3ToLibrary` convertește acum fișierul MP3 în `ArrayBuffer` înainte de scrierea în `IndexedDB` (evitând bug-ul iOS Safari la stocarea directă de `Blob`), iar `renderLibrary` reconstruiește `Blob`-ul pentru redare și partajare (păstrând compatibilitatea cu intrările vechi).
+   - Adăugat status vizual live (`⏳ Se salvează în arhiva offline...` $\rightarrow$ `✅ Salvat în arhiva ta offline`).
+2. **Sincronizare `v18`:**
    - Copiat `public/` în rădăcină, actualizat `~/.yt2mp3-service` prin `./install-mac-service.sh` și publicat pe `origin main`.
 

@@ -162,16 +162,16 @@
     searchForm.addEventListener('change', syncFallbackClasses);
   }
 
-  const CURRENT_APP_VERSION = 'v17';
+  const CURRENT_APP_VERSION = 'v18';
   let latestVersionInfo = {
     version: CURRENT_APP_VERSION,
     date: '23 Noiembrie 2026',
-    title: 'Actualizare Nouă — YT2MP3 v17',
-    subtitle: '23 Noiembrie 2026 • Player audio iOS reparat & buton aliniat perfect',
+    title: 'Actualizare Nouă — YT2MP3 v18 (Arhivă Offline iOS)',
+    subtitle: '23 Noiembrie 2026 • Arhiva cu melodii salvate funcționează acum 100% și pe iPhone',
     notes: [
-      '🎧 Suport HTTP Range (206 Partial Content) pentru redarea audio instantă pe iPhone',
-      '💾 Recuperare automată a MP3-urilor de pe disc chiar și după un restart de server',
-      '📐 Aliniere perfectă a butonului roșu „Descarcă MP3” în interiorul cardului',
+      '💾 Reparată salvarea în arhiva offline pe iPhone / Safari (stocare ArrayBuffer în IndexedDB)',
+      '✅ Confirmare vizuală „Salvat în arhiva ta offline” după fiecare descărcare',
+      '🎧 Suport HTTP Range 206 pentru redare audio instantă pe iOS',
       '📊 Bară de progres la actualizare & stare „Nu există actualizări momentan”'
     ]
   };
@@ -365,7 +365,7 @@
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker
-      .register('./sw.js?v=17')
+      .register('./sw.js?v=18')
       .then((reg) => {
         swRegistration = reg;
         reg.addEventListener('updatefound', () => {
@@ -516,6 +516,7 @@
   }
 
   async function saveMp3ToLibrary({ fileName, blob }) {
+    const buffer = await blob.arrayBuffer();
     const db = await openDb();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, 'readwrite');
@@ -523,13 +524,14 @@
       const item = {
         id: `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
         fileName,
-        size: blob.size,
+        size: buffer.byteLength,
         createdAt: Date.now(),
-        blob
+        data: buffer
       };
       store.put(item);
       tx.oncomplete = () => resolve(item);
       tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error || new Error('Tranzacție IndexedDB anulată.'));
     });
   }
 
@@ -634,12 +636,16 @@
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'library-actions';
 
+        const itemBlob = item.data
+          ? new Blob([item.data], { type: 'audio/mpeg' })
+          : item.blob;
+
         const shareBtn = document.createElement('button');
         shareBtn.type = 'button';
         shareBtn.className = 'btn-icon';
         shareBtn.textContent = '📤 Fișiere / Share';
         shareBtn.addEventListener('click', () => {
-          shareOrSaveOnIphone(item.blob, item.fileName);
+          shareOrSaveOnIphone(itemBlob, item.fileName);
         });
 
         const delBtn = document.createElement('button');
@@ -661,7 +667,9 @@
         audioEl.controls = true;
         audioEl.preload = 'metadata';
         audioEl.className = 'player-bar';
-        audioEl.src = URL.createObjectURL(item.blob);
+        if (itemBlob) {
+          audioEl.src = URL.createObjectURL(itemBlob);
+        }
 
         card.appendChild(topRow);
         card.appendChild(audioEl);
@@ -861,21 +869,29 @@
               });
               statusCard.appendChild(shareBtn);
 
-              // Salvare non-blocanta in biblioteca offline in fundal
+              const saveStatusEl = document.createElement('p');
+              saveStatusEl.className = 'preview-sub';
+              saveStatusEl.textContent = '⏳ Se salvează în arhiva offline...';
+              statusCard.appendChild(saveStatusEl);
+
+              // Salvare non-blocanta in biblioteca offline in fundal (ArrayBuffer compatibil iOS)
               (async () => {
                 try {
                   const controller = new AbortController();
-                  const t = setTimeout(() => controller.abort(), 20000);
+                  const t = setTimeout(() => controller.abort(), 30000);
                   const r = await fetch(inlineFileUrl, { signal: controller.signal });
                   clearTimeout(t);
-                  if (!r.ok) return;
+                  if (!r.ok) throw new Error('HTTP ' + r.status);
                   cachedBlob = await r.blob();
                   await Promise.race([
                     saveMp3ToLibrary({ fileName, blob: cachedBlob }),
-                    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 15000))
                   ]);
                   await renderLibrary();
-                } catch (_) {}
+                  saveStatusEl.textContent = '✅ Salvat în arhiva ta offline (vezi lista de mai jos)';
+                } catch (_) {
+                  saveStatusEl.textContent = 'ℹ️ Poți descărca melodia direct cu butonul de mai sus.';
+                }
               })();
               return;
             } else if (job.status === 'error') {
