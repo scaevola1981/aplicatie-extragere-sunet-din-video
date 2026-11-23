@@ -2,7 +2,7 @@
 
 Aplicație **Progressive Web App (PWA)** pentru căutarea videoclipurilor pe YouTube și extragerea rapidă a sunetului în format **MP3** (`256 kbps`, `192 kbps`, `128 kbps`), cu bibliotecă audio **100% Offline** (`IndexedDB`) și interfață **Neo-Skeuomorphism** (temă **White Porcelain** & **Dark Obsidian Graphite**).
 
-- 🌐 **URL Live (GitHub Pages):** [https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=16](https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=16)
+- 🌐 **URL Live (GitHub Pages):** [https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=17](https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=17)
 - 🔒 **URL Direct Permanent (Tailscale Funnel 24/7):** [https://mac-mini-florin.tail1bff6a.ts.net](https://mac-mini-florin.tail1bff6a.ts.net)
 - 📦 **Repository GitHub:** [https://github.com/scaevola1981/aplicatie-extragere-sunet-din-video](https://github.com/scaevola1981/aplicatie-extragere-sunet-din-video)
 - 📋 **Reguli & Jurnal Sesiuni Agent:** [`regului.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/regului.md) & [`AGENTS.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/AGENTS.md)
@@ -79,6 +79,10 @@ Fișierele din [`public/`](file:///Users/florindorobantu/Desktop/Aplicatie-trans
 
 ## 📝 Istoric Versiuni (Changelog)
 
+- **`v17` (23 Noiembrie 2026):**
+  - Adăugat suport complet `HTTP Range` (`206 Partial Content` + `Accept-Ranges: bytes`) în [`server.js`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/server.js) pentru redarea corectă a playerului `<audio>` pe iOS Safari.
+  - Adăugat fallback pe disc în `/api/jobs/:id/file` astfel încât MP3-urile deja generate rămân descărcabile chiar și după o repornire a serverului.
+  - Adăugat `a` în regula `box-sizing: border-box` din [`public/styles.css`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/public/styles.css) pentru alinierea perfectă a butonului roșu **⬇️ Descarcă MP3**.
 - **`v16` (23 Noiembrie 2026):**
   - Adăugată **bară de progres live** (`15% → 45% → 80% → 100%`) în interiorul modalului de actualizare atunci când se apasă **🚀 Actualizează acum**.
   - Odată ajuns pe ultima versiune, modalul **nu mai apare automat**; la apăsarea manuală pe `🔄 v16` în antet, afișează starea **„Nu există actualizări momentan”** cu butonul **👍 Închide**.

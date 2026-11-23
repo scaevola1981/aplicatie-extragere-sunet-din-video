@@ -1,12 +1,12 @@
 {
-  "version": "v16",
+  "version": "v17",
   "date": "23 Noiembrie 2026",
-  "title": "Actualizare Nouă — YT2MP3 v16",
-  "subtitle": "23 Noiembrie 2026 • Bară de progres la actualizare & stare „La zi”",
+  "title": "Actualizare Nouă — YT2MP3 v17",
+  "subtitle": "23 Noiembrie 2026 • Player audio iOS reparat & buton aliniat perfect",
   "notes": [
-    "📊 Bară de progres live la apăsarea butonului „Actualizează acum”",
-    "✅ După actualizare, modalul nu mai apare automat și afișează „Nu există actualizări momentan”",
-    "⚡ Descărcare MP3 instantă pe iPhone + player audio integrat",
-    "🔒 Conexiune HTTPS permanentă 24/7 prin Tailscale Funnel"
+    "🎧 Suport HTTP Range (206 Partial Content) pentru redarea audio instantă pe iPhone",
+    "💾 Recuperare automată a MP3-urilor de pe disc chiar și după un restart de server",
+    "📐 Aliniere perfectă a butonului roșu „Descarcă MP3” în interiorul cardului",
+    "📊 Bară de progres la actualizare & stare „Nu există actualizări momentan”"
   ]
 }

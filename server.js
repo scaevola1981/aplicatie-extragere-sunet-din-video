@@ -579,7 +579,24 @@ const server = http.createServer(async (req, res) => {
     if (jobMatch && req.method === 'GET') {
       const jobId = jobMatch[1];
       const isFileRequest = jobMatch[2] === 'file';
-      const job = jobs.get(jobId);
+      let job = jobs.get(jobId);
+
+      // Fallback pe disc daca serverul s-a repornit dupa ce MP3-ul fusese deja generat
+      if (!job && isFileRequest) {
+        const diskDir = path.join(TMP_BASE_DIR, jobId);
+        if (fs.existsSync(diskDir)) {
+          const diskFiles = fs.readdirSync(diskDir);
+          const diskMp3 = diskFiles.find((f) => f.toLowerCase().endsWith('.mp3'));
+          if (diskMp3) {
+            job = {
+              id: jobId,
+              status: 'completed',
+              filePath: path.join(diskDir, diskMp3),
+              fileName: diskMp3
+            };
+          }
+        }
+      }
 
       if (!job) {
         return sendJson(res, 404, { error: 'Sesiunea de descărcare nu a fost găsită.' });
@@ -602,22 +619,46 @@ const server = http.createServer(async (req, res) => {
       }
 
       const stat = fs.statSync(job.filePath);
+      const totalSize = stat.size;
       const asciiFallback = job.fileName.replace(/[^\x20-\x7E]+/g, '_');
       const encodedName = encodeURIComponent(job.fileName);
       const isInline = parsedUrl.searchParams.get('inline') === '1';
 
-      const fileHeaders = {
+      const baseHeaders = {
         'Content-Type': 'audio/mpeg',
-        'Content-Length': stat.size,
+        'Accept-Ranges': 'bytes',
         'Cache-Control': 'no-store',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Private-Network': 'true'
       };
       if (!isInline) {
-        fileHeaders['Content-Disposition'] = `attachment; filename="${asciiFallback}"; filename*=UTF-8''${encodedName}`;
+        baseHeaders['Content-Disposition'] = `attachment; filename="${asciiFallback}"; filename*=UTF-8''${encodedName}`;
       }
 
-      res.writeHead(200, fileHeaders);
+      const rangeHeader = req.headers.range;
+      if (rangeHeader) {
+        const match = rangeHeader.match(/bytes=(\d*)-(\d*)/);
+        if (match) {
+          const start = match[1] ? parseInt(match[1], 10) : 0;
+          const end = match[2] ? Math.min(parseInt(match[2], 10), totalSize - 1) : totalSize - 1;
+          if (start >= totalSize || start > end) {
+            res.writeHead(416, { 'Content-Range': `bytes */${totalSize}` });
+            return res.end();
+          }
+          res.writeHead(206, {
+            ...baseHeaders,
+            'Content-Range': `bytes ${start}-${end}/${totalSize}`,
+            'Content-Length': end - start + 1
+          });
+          fs.createReadStream(job.filePath, { start, end }).pipe(res);
+          return;
+        }
+      }
+
+      res.writeHead(200, {
+        ...baseHeaders,
+        'Content-Length': totalSize
+      });
       fs.createReadStream(job.filePath).pipe(res);
       return;
     }
