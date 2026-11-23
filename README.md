@@ -2,7 +2,7 @@
 
 Aplicație **Progressive Web App (PWA)** pentru căutarea videoclipurilor pe YouTube și extragerea rapidă a sunetului în format **MP3** (`256 kbps`, `192 kbps`, `128 kbps`), cu bibliotecă audio **100% Offline** (`IndexedDB`) și interfață **Neo-Skeuomorphism** (temă **White Porcelain** & **Dark Obsidian Graphite**).
 
-- 🌐 **URL Live (GitHub Pages):** [https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=13](https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=13)
+- 🌐 **URL Live (GitHub Pages):** [https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=14](https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=14)
 - 🔒 **URL Direct Permanent (Tailscale Funnel 24/7):** [https://mac-mini-florin.tail1bff6a.ts.net](https://mac-mini-florin.tail1bff6a.ts.net)
 - 📦 **Repository GitHub:** [https://github.com/scaevola1981/aplicatie-extragere-sunet-din-video](https://github.com/scaevola1981/aplicatie-extragere-sunet-din-video)
 - 📋 **Reguli & Jurnal Sesiuni Agent:** [`regului.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/regului.md) & [`AGENTS.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/AGENTS.md)
@@ -79,6 +79,9 @@ Fișierele din [`public/`](file:///Users/florindorobantu/Desktop/Aplicatie-trans
 
 ## 📝 Istoric Versiuni (Changelog)
 
+- **`v14` (23 Noiembrie 2026):**
+  - Reparat blocajul `Se salvează fișierul MP3 pe telefon...` pe iPhone / Safari: înlocuit `setInterval` suprapus cu polling secvențial `setTimeout`, adăugat timeout de 5s la salvarea în `IndexedDB` și buton direct de descărcare MP3 (`<a download>`) pe lângă `navigator.share`.
+  - Reparat butonul `🚀 Actualizează acum` pe iOS PWA: dezînregistrare Service Worker vechi, curățare cache și navigare cu parametru unic `?v=14&r=...` pentru reîncărcare garantată.
 - **`v13` (23 Noiembrie 2026):**
   - Instalat [`server.js`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/server.js) ca **serviciu invizibil de sistem macOS (`launchd`)** prin [`install-mac-service.sh`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/install-mac-service.sh) (rulează automat din `~/.yt2mp3-service` la pornirea Mac mini-ului, chiar și cu Antigravity și proiectul complet închise).
   - Activat **Tailscale Funnel permanent** (`https://mac-mini-florin.tail1bff6a.ts.net`) — adresă HTTPS fixă care nu mai expiră și nu mai necesită cookie-uri YouTube.

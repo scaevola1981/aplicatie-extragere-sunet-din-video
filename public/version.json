@@ -1,12 +1,12 @@
 {
-  "version": "v13",
+  "version": "v14",
   "date": "23 Noiembrie 2026",
-  "title": "Actualizare Nouă — YT2MP3 v13 (Permanent 24/7)",
-  "subtitle": "23 Noiembrie 2026 • Adresă HTTPS fixă permanentă + serviciu automat macOS",
+  "title": "Actualizare Nouă — YT2MP3 v14 (Fix iOS)",
+  "subtitle": "23 Noiembrie 2026 • Salvare MP3 instantă pe iPhone & buton Actualizare reparat",
   "notes": [
-    "🔒 Adresă HTTPS fixă permanentă (Tailscale Funnel) — nu mai expiră niciodată",
-    "⚙️ Serviciu automat în fundal pe Mac mini (funcționează chiar și cu proiectul închis)",
-    "🚀 Sistem inteligent de actualizare în aplicație (Actualizează acum / Mai târziu)",
-    "🎨 Design Neo-Skeuomorphism (White & Dark) + Safe Area pentru iPhone Notch"
+    "📱 Reparat blocajul „Se salvează fișierul MP3 pe telefon...” pe iPhone / Safari",
+    "📥 Adăugat buton direct de descărcare MP3 + Salvare în Fișiere pe iOS",
+    "🔄 Reparat butonul „Actualizează acum” pentru reîncărcare garantată pe iOS PWA",
+    "🔒 Adresă HTTPS permanentă 24/7 (Tailscale Funnel + serviciu automat macOS)"
   ]
 }

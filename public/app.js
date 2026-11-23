@@ -157,17 +157,17 @@
     searchForm.addEventListener('change', syncFallbackClasses);
   }
 
-  const CURRENT_APP_VERSION = 'v13';
+  const CURRENT_APP_VERSION = 'v14';
   let latestVersionInfo = {
     version: CURRENT_APP_VERSION,
     date: '23 Noiembrie 2026',
-    title: 'Actualizare Nouă — YT2MP3 v13 (Permanent 24/7)',
-    subtitle: '23 Noiembrie 2026 • Adresă HTTPS fixă permanentă + serviciu automat macOS',
+    title: 'Actualizare Nouă — YT2MP3 v14 (Fix iOS)',
+    subtitle: '23 Noiembrie 2026 • Salvare MP3 instantă pe iPhone & buton Actualizare reparat',
     notes: [
-      '🔒 Adresă HTTPS fixă permanentă (Tailscale Funnel) — nu mai expiră niciodată',
-      '⚙️ Serviciu automat în fundal pe Mac mini (funcționează chiar și cu proiectul închis)',
-      '🚀 Sistem inteligent de actualizare în aplicație (Actualizează acum / Mai târziu)',
-      '🎨 Design Neo-Skeuomorphism (White & Dark) + Safe Area pentru iPhone Notch'
+      '📱 Reparat blocajul „Se salvează fișierul MP3 pe telefon...” pe iPhone / Safari',
+      '📥 Adăugat buton direct de descărcare MP3 + Salvare în Fișiere pe iOS',
+      '🔄 Reparat butonul „Actualizează acum” pentru reîncărcare garantată pe iOS PWA',
+      '🔒 Adresă HTTPS permanentă 24/7 (Tailscale Funnel + serviciu automat macOS)'
     ]
   };
   let swRegistration = null;
@@ -221,20 +221,17 @@
       sessionStorage.removeItem('yt2mp3_dismissed_version');
     } catch (_) {}
 
-    if (updateStatusMsg) {
-      updateStatusMsg.textContent = '⏳ Se descarcă și se aplică noile actualizări...';
-      updateStatusMsg.classList.remove('hidden');
-    }
+    showLoadingCard(`Se actualizează aplicația la ${targetVer}...`);
 
     try {
       if ('serviceWorker' in navigator) {
         const regs = await navigator.serviceWorker.getRegistrations();
         for (const reg of regs) {
           try {
-            await reg.update();
             if (reg.waiting) {
               reg.waiting.postMessage('SKIP_WAITING');
             }
+            await reg.unregister();
           } catch (_) {}
         }
       }
@@ -245,9 +242,10 @@
     } catch (_) {}
 
     const nextUrl = new URL(window.location.href);
-    const verNum = String(targetVer).replace(/^v/i, '') || '10';
+    const verNum = String(targetVer).replace(/^v/i, '') || '14';
     nextUrl.searchParams.set('v', verNum);
-    window.location.replace(nextUrl.toString());
+    nextUrl.searchParams.set('r', String(Date.now()));
+    window.location.href = nextUrl.toString();
   }
 
   async function checkForAppUpdates(forceOpen = false) {
@@ -302,7 +300,7 @@
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker
-      .register('./sw.js?v=13')
+      .register('./sw.js?v=14')
       .then((reg) => {
         swRegistration = reg;
         reg.addEventListener('updatefound', () => {
@@ -682,7 +680,7 @@
 
   async function startMp3Extraction(video) {
     if (activePollTimer) {
-      clearInterval(activePollTimer);
+      clearTimeout(activePollTimer);
       activePollTimer = null;
     }
 
@@ -720,9 +718,12 @@
         const { res, base } = jobStartHit;
         const data = await res.json();
         const jobId = data.id;
-        activePollTimer = setInterval(async () => {
+        let isStopped = false;
+
+        const pollOnce = async () => {
+          if (isStopped) return;
           try {
-            const pollRes = await fetch(`${base}/api/jobs/${jobId}`);
+            const pollRes = await fetch(`${base}/api/jobs/${jobId}`, { cache: 'no-store' });
             const job = await pollRes.json();
             if (!pollRes.ok) {
               throw new Error(job.error || 'Eroare la verificarea progresului.');
@@ -732,47 +733,89 @@
             statusLineEl.textContent = `${job.statusText} (${job.progress || 0}%)`;
 
             if (job.status === 'completed') {
-              clearInterval(activePollTimer);
-              activePollTimer = null;
-
-              statusLineEl.textContent = 'Se salvează fișierul MP3 pe telefon...';
-              const fileRes = await fetch(`${base}/api/jobs/${jobId}/file`);
-              if (!fileRes.ok) {
-                throw new Error('Nu s-a putut prelua fișierul MP3.');
+              isStopped = true;
+              if (activePollTimer) {
+                clearTimeout(activePollTimer);
+                activePollTimer = null;
               }
-              const mp3Blob = await fileRes.blob();
-              const fileName = job.fileName || `${video.title}.mp3`;
 
-              await saveMp3ToLibrary({ fileName, blob: mp3Blob });
-              await renderLibrary();
-              triggerBrowserDownload(mp3Blob, fileName);
+              const directFileUrl = `${base}/api/jobs/${jobId}/file`;
+              const fileName = job.fileName || `${video.title}.mp3`;
+              statusLineEl.textContent = 'Se descarcă fișierul MP3 de pe server...';
+
+              let mp3Blob = null;
+              try {
+                const fileRes = await fetch(directFileUrl);
+                if (!fileRes.ok) {
+                  throw new Error('Nu s-a putut prelua fișierul MP3.');
+                }
+                mp3Blob = await fileRes.blob();
+              } catch (_) {}
+
+              if (mp3Blob) {
+                try {
+                  await Promise.race([
+                    saveMp3ToLibrary({ fileName, blob: mp3Blob }),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+                  ]);
+                  await renderLibrary();
+                } catch (_) {}
+
+                try {
+                  triggerBrowserDownload(mp3Blob, fileName);
+                } catch (_) {}
+              }
 
               statusCard.innerHTML = '';
               const doneTitle = document.createElement('p');
               doneTitle.className = 'preview-title';
-              doneTitle.textContent = `✅ Descărcat: ${fileName}`;
-
-              const shareBtn = document.createElement('button');
-              shareBtn.type = 'button';
-              shareBtn.className = 'btn btn-success';
-              shareBtn.textContent = '📂 Salvează în Fișiere (iPhone) / Trimite pe WhatsApp';
-              shareBtn.addEventListener('click', () => {
-                shareOrSaveOnIphone(mp3Blob, fileName);
-              });
-
+              doneTitle.textContent = `✅ Gata: ${fileName}`;
               statusCard.appendChild(doneTitle);
-              statusCard.appendChild(shareBtn);
+
+              if (mp3Blob) {
+                const shareBtn = document.createElement('button');
+                shareBtn.type = 'button';
+                shareBtn.className = 'btn btn-success';
+                shareBtn.textContent = '📂 Salvează în Fișiere (iPhone) / Trimite pe WhatsApp';
+                shareBtn.addEventListener('click', () => {
+                  shareOrSaveOnIphone(mp3Blob, fileName);
+                });
+                statusCard.appendChild(shareBtn);
+              }
+
+              const directLink = document.createElement('a');
+              directLink.href = directFileUrl;
+              directLink.download = fileName;
+              directLink.className = 'btn btn-secondary btn-full';
+              directLink.style.textDecoration = 'none';
+              directLink.textContent = '⬇️ Descarcă MP3 Direct (Safari / Fișiere)';
+              statusCard.appendChild(directLink);
+              return;
             } else if (job.status === 'error') {
-              clearInterval(activePollTimer);
-              activePollTimer = null;
+              isStopped = true;
+              if (activePollTimer) {
+                clearTimeout(activePollTimer);
+                activePollTimer = null;
+              }
               showErrorCard(job.error || 'Conversia MP3 a eșuat.');
+              return;
             }
           } catch (err) {
-            clearInterval(activePollTimer);
-            activePollTimer = null;
+            isStopped = true;
+            if (activePollTimer) {
+              clearTimeout(activePollTimer);
+              activePollTimer = null;
+            }
             showErrorCard(err.message);
+            return;
           }
-        }, 650);
+
+          if (!isStopped) {
+            activePollTimer = setTimeout(pollOnce, 750);
+          }
+        };
+
+        activePollTimer = setTimeout(pollOnce, 650);
         return;
       } catch (_) {}
     }

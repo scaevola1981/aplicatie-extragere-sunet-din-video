@@ -9,7 +9,7 @@ Acest fișier trebuie **citit la începutul fiecărei sesiuni** și **actualizat
 De fiecare dată când utilizatorul îți trimite o cerere nouă în acest proiect:
 
 1. **Citește [`regului.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/regului.md) și [`README.md`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/README.md)** pentru a ști exact:
-   - Care este **versiunea curentă de cache PWA** (în prezent: **`v13`**).
+   - Care este **versiunea curentă de cache PWA** (în prezent: **`v14`**).
    - Care este **URL-ul permanent de backend (Tailscale Funnel)** configurat în `DEFAULT_TUNNEL_API` din [`public/app.js`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/public/app.js) (`https://mac-mini-florin.tail1bff6a.ts.net`).
    - Ce s-a lucrat la ultima intervenție.
 2. **Verifică procesele de fundal (`manage_task` cu `Action: "list"`):**
@@ -52,16 +52,17 @@ Ori de câte ori modifici codul aplicației (HTML, CSS, JS sau backend):
 ## 📊 3. Starea Tehnică la Zi & Ultima Intervenție
 
 - **Data ultimei actualizări:** `23 Noiembrie 2026`
-- **Versiunea PWA curentă:** `v13`
-- **URL Live GitHub Pages:** `https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=13`
+- **Versiunea PWA curentă:** `v14`
+- **URL Live GitHub Pages:** `https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=14`
 - **URL Permanent Tailscale Funnel (Mac mini 24/7):** `https://mac-mini-florin.tail1bff6a.ts.net` (`proxy http://127.0.0.1:3080`, activ permanent în fundal).
 - **Serviciu macOS (`launchd`):** `com.florin.yt2mp3.server` (instalare/actualizare prin `./install-mac-service.sh`, rulează din `~/.yt2mp3-service` chiar și cu proiectul și Antigravity închise).
 
-### Ce am făcut ultima oară (23 Noiembrie 2026 — `v13`):
-1. **Serviciu invizibil macOS (`launchd`):**
-   - Creat [`install-mac-service.sh`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/install-mac-service.sh) care copiază runtime-ul în `~/.yt2mp3-service` (evitând restricțiile TCC de pe Desktop) și configurează `~/Library/LaunchAgents/com.florin.yt2mp3.server.plist` cu `RunAtLoad` + `KeepAlive`.
-2. **Tailscale Funnel permanent activat (`https://mac-mini-florin.tail1bff6a.ts.net`):**
-   - Expune portul `3080` pe internet cu certificat HTTPS permanent, fără blocaje anti-bot YouTube (folosește IP-ul rezidențial de acasă) și fără a depinde de deschiderea proiectului.
-3. **Sincronizare PWA v13 pe GitHub Pages + `~/.yt2mp3-service`:**
-   - Actualizat `DEFAULT_TUNNEL_API`, `version.json`, `sw.js`, `index.html`, `README.md` și `regului.md` la `v13` și publicat pe `origin main`.
+### Ce am făcut ultima oară (23 Noiembrie 2026 — `v14`):
+1. **Fix blocaj descărcare MP3 pe iPhone / Safari (`Se salvează fișierul MP3 pe telefon...`):**
+   - Înlocuit `setInterval` cu polling secvențial (`setTimeout`) ca să nu se suprapună cererile la finalizarea conversiei.
+   - Protejat `saveMp3ToLibrary` (`IndexedDB`) cu timeout de 5s + `try/catch` și adăugat buton direct `<a download>` către `/api/jobs/:id/file` pe lângă butonul iOS `navigator.share`.
+2. **Fix buton „🚀 Actualizează acum” pe iOS Safari PWA:**
+   - Dezînregistrează Service Worker-ul vechi, șterge toate cache-urile și forțează reîncărcarea cu parametru unic `?v=14&r=<timestamp>` (evitând ignorarea reload-ului când URL-ul era identic).
+3. **Sincronizare `v14`:**
+   - Copiat `public/` în rădăcină, actualizat `~/.yt2mp3-service` prin `./install-mac-service.sh` și publicat pe `origin main`.
 

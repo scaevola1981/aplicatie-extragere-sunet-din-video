@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yt2mp3-pwa-v13';
+const CACHE_NAME = 'yt2mp3-pwa-v14';
 const ASSETS = [
   './',
   './index.html',
