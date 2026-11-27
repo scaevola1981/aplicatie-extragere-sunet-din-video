@@ -79,6 +79,9 @@ Fișierele din [`public/`](file:///Users/florindorobantu/Desktop/Aplicatie-trans
 
 ## 📝 Istoric Versiuni (Changelog)
 
+- **`v18` + Backend Auto-Update (27 Noiembrie 2026):**
+  - Actualizat `yt-dlp` la `stable@2026.11.23` (rezolvă eroarea YouTube `This video is not available` cauzată de noul player YouTube).
+  - Adăugat `--js-runtimes node:...` și **auto-actualizare zilnică `yt-dlp -U`** în [`server.js`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/server.js) astfel încât motorul YouTube rămâne mereu la zi automat.
 - **`v18` (23 Noiembrie 2026):**
   - Reparată salvarea arhivei cu melodii MP3 în `IndexedDB` pe iPhone / Safari: fișierele sunt acum stocate ca `ArrayBuffer` (în loc de `Blob`, care genera blocaje/erori în WebKit iOS), păstrând compatibilitatea și cu melodiile salvate anterior.
   - Adăugată confirmare vizuală live (`✅ Salvat în arhiva ta offline`) în card după finalizarea fiecărei descărcări.

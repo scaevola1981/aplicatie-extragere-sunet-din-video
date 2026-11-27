@@ -51,16 +51,14 @@ Ori de câte ori modifici codul aplicației (HTML, CSS, JS sau backend):
 
 ## 📊 3. Starea Tehnică la Zi & Ultima Intervenție
 
-- **Data ultimei actualizări:** `23 Noiembrie 2026`
+- **Data ultimei actualizări:** `27 Noiembrie 2026`
 - **Versiunea PWA curentă:** `v18`
 - **URL Live GitHub Pages:** `https://scaevola1981.github.io/aplicatie-extragere-sunet-din-video/?v=18`
 - **URL Permanent Tailscale Funnel (Mac mini 24/7):** `https://mac-mini-florin.tail1bff6a.ts.net` (`proxy http://127.0.0.1:3080`, activ permanent în fundal).
 - **Serviciu macOS (`launchd`):** `com.florin.yt2mp3.server` (instalare/actualizare prin `./install-mac-service.sh`, rulează din `~/.yt2mp3-service` chiar și cu proiectul și Antigravity închise).
 
-### Ce am făcut ultima oară (23 Noiembrie 2026 — `v18`):
-1. **Fix arhivă offline `IndexedDB` pe iPhone / iOS Safari (`public/app.js`):**
-   - `saveMp3ToLibrary` convertește acum fișierul MP3 în `ArrayBuffer` înainte de scrierea în `IndexedDB` (evitând bug-ul iOS Safari la stocarea directă de `Blob`), iar `renderLibrary` reconstruiește `Blob`-ul pentru redare și partajare (păstrând compatibilitatea cu intrările vechi).
-   - Adăugat status vizual live (`⏳ Se salvează în arhiva offline...` $\rightarrow$ `✅ Salvat în arhiva ta offline`).
-2. **Sincronizare `v18`:**
-   - Copiat `public/` în rădăcină, actualizat `~/.yt2mp3-service` prin `./install-mac-service.sh` și publicat pe `origin main`.
+### Ce am făcut ultima oară (27 Noiembrie 2026 — Fix YouTube `This video is not available` + Auto-Update `yt-dlp`):
+1. **Reconectat Tailscale (`Tailscale up`)** pe Mac mini după ce aplicația Tailscale fusese oprită.
+2. **Actualizat `yt-dlp` (`2026.10.26` $\rightarrow$ `2026.11.23`)** în `bin/yt-dlp` și `~/.yt2mp3-service/bin/yt-dlp` (noul player YouTube `b485e332` dădea eroare pe versiunea din octombrie).
+3. **Adăugat `--js-runtimes node:...` + auto-update `yt-dlp -U` la pornire și la fiecare 24h** în [`server.js`](file:///Users/florindorobantu/Desktop/Aplicatie-transformare-video%20in%20MP3/server.js), reinstalat serviciul prin `./install-mac-service.sh` și publicat pe `origin main`.
 

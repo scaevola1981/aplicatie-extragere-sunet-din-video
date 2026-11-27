@@ -412,6 +412,7 @@ async function startMp3Job({ url, quality = '0', title = 'Melodie YouTube' }) {
           '--add-metadata',
           '--no-playlist',
           '--newline',
+          '--js-runtimes', `node:${process.execPath}`,
           '-o', path.join(jobDir, '%(title).100s.%(ext)s')
         ];
         if (playerClient) {
@@ -710,7 +711,19 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log(`📱 Pe iPhone / Android (același Wi-Fi): http://${ip}:${PORT}`);
   }
   console.log(`==================================================\n`);
-  ensureYtDlpBinary().catch((err) => {
-    console.error('Atentie la pregatirea yt-dlp:', err.message);
-  });
+  ensureYtDlpBinary()
+    .then((binPath) => {
+      // Auto-actualizare non-blocanta yt-dlp la pornire si o data la 24h
+      const runAutoUpdate = () => {
+        try {
+          const upd = spawn(binPath, ['-U'], { stdio: 'ignore' });
+          upd.on('error', () => {});
+        } catch (_) {}
+      };
+      runAutoUpdate();
+      setInterval(runAutoUpdate, 24 * 60 * 60 * 1000);
+    })
+    .catch((err) => {
+      console.error('Atentie la pregatirea yt-dlp:', err.message);
+    });
 });
